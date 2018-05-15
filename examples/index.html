@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>example</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../dist/HttpApi.umd.js"></script>
+<script>
+const api = new HttpApi({
+  base: 'http://localhost:8082',
+  fetchOptions: {
+    headers: {
+      foo: 'bar'
+    }
+  },
+  beforeFetch(url, options) {
+    console.log(url, options)
+  },
+  responseHandler(res) {
+    return res.text()
+  }
+})
+
+api.get('/examples/index.html').then(text => {
+  console.log(text)
+})
+</script>
+</head>
+<body>
+</body>
+</html>
