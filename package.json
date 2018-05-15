@@ -1,7 +1,7 @@
 {
-  "name": "httpapi",
+  "name": "@fenivana/http-api",
   "version": "0.1.0",
-  "description": "A thin Fetch API wrapper",
+  "description": "A cross-platform fetch API wrapper.",
   "main": "dist/HttpApi.node.js",
   "module": "dist/HttpApi.esm.js",
   "browser": "dist/HttpApi.umd.js",

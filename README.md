@@ -4,7 +4,7 @@ A cross-platform fetch API wrapper.
 ## Usage
 
 ```js
-import HttpApi from 'httpapi'
+import HttpApi from '@fenivana/http-api'
 
 const api = new HttpApi({
   base: 'http://api.example.com/services',
