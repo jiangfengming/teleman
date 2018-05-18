@@ -1,6 +1,12 @@
 # HttpApi
 A cross-platform fetch API wrapper.
 
+## Installation
+
+```sh
+npm i @fenivana/http-api
+```
+
 ## Usage
 
 ```js
@@ -54,7 +60,7 @@ function beforeFetch(url, options) {
 ```
 `url` and `options` are parameters that would pass to `fetch()` function.  
 
-`responseHandler`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.
+`responseHandler`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
 Function signature:
 
 ```js
@@ -74,7 +80,7 @@ The `responseHandler` is usually used to
 Params:  
 `url`: String. The url of the request. The final url will be `base + url + querystring`.
 `method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'. Defaults to 'GET'.
-`headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
+`headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.  
 `query`: String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The URL queries. String/Object/Array type will be used to create a URLSearchParams instance.  
 `body`: Object | FormData | Blob | BufferSource | URLSearchParams | String. Any body that you want to add to your request.
