@@ -95,7 +95,19 @@
           query = new URLSearchParams(query);
         }
 
-        for (var _ref4 in query.entries()) {
+        for (var _iterator = query.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+          var _ref5;
+
+          if (_isArray) {
+            if (_i >= _iterator.length) break;
+            _ref5 = _iterator[_i++];
+          } else {
+            _i = _iterator.next();
+            if (_i.done) break;
+            _ref5 = _i.value;
+          }
+
+          var _ref4 = _ref5;
           var name = _ref4[0];
           var value = _ref4[1];
 
@@ -107,21 +119,21 @@
 
       if (this.fetchOptions.headers && headers) {
         var h = new Headers(this.fetchOptions.headers);
-        for (var _iterator = new Headers(headers).entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref6;
+        for (var _iterator2 = new Headers(headers).entries(), _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+          var _ref7;
 
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref6 = _iterator[_i++];
+          if (_isArray2) {
+            if (_i2 >= _iterator2.length) break;
+            _ref7 = _iterator2[_i2++];
           } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref6 = _i.value;
+            _i2 = _iterator2.next();
+            if (_i2.done) break;
+            _ref7 = _i2.value;
           }
 
-          var _ref5 = _ref6;
-          var _name = _ref5[0];
-          var _value = _ref5[1];
+          var _ref6 = _ref7;
+          var _name = _ref6[0];
+          var _value = _ref6[1];
 
           h.set(_name, _value);
         }
@@ -187,11 +199,11 @@
     };
 
     HttpApi.prototype.post = function post(url, body) {
-      var _ref7 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var _ref8 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var _ref7$type = _ref7.type,
-          type = _ref7$type === undefined ? 'json' : _ref7$type,
-          options = objectWithoutProperties(_ref7, ['type']);
+      var _ref8$type = _ref8.type,
+          type = _ref8$type === undefined ? 'json' : _ref8$type,
+          options = objectWithoutProperties(_ref8, ['type']);
 
       return this.fetch(url, _extends({
         method: 'POST',
@@ -201,11 +213,11 @@
     };
 
     HttpApi.prototype.put = function put(url, body) {
-      var _ref8 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var _ref9 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var _ref8$type = _ref8.type,
-          type = _ref8$type === undefined ? 'json' : _ref8$type,
-          options = objectWithoutProperties(_ref8, ['type']);
+      var _ref9$type = _ref9.type,
+          type = _ref9$type === undefined ? 'json' : _ref9$type,
+          options = objectWithoutProperties(_ref9, ['type']);
 
       return this.fetch(url, _extends({
         method: 'PUT',
@@ -215,11 +227,11 @@
     };
 
     HttpApi.prototype.patch = function patch(url, body) {
-      var _ref9 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var _ref10 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var _ref9$type = _ref9.type,
-          type = _ref9$type === undefined ? 'json' : _ref9$type,
-          options = objectWithoutProperties(_ref9, ['type']);
+      var _ref10$type = _ref10.type,
+          type = _ref10$type === undefined ? 'json' : _ref10$type,
+          options = objectWithoutProperties(_ref10, ['type']);
 
       return this.fetch(url, _extends({
         method: 'PATCH',

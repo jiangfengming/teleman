@@ -30,7 +30,7 @@ class HttpApi {
         query = new URLSearchParams(query);
       }
 
-      for (const [name, value] in query.entries()) {
+      for (const [name, value] of query.entries()) {
         url.searchParams.append(name, value);
       }
 
