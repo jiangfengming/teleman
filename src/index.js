@@ -1,13 +1,15 @@
 class HttpApi {
-  constructor({ base = '', fetchOptions = {}, beforeFetch, responseHandler } = {}) {
+  constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
     this.base = base
-    this.fetchOptions = fetchOptions
+    this.fetchOptions = fetchOptions || {}
     this.beforeFetch = beforeFetch
-    this.responseHandler = responseHandler
+    this.complete = complete
+    this.error = error
   }
 
   fetch(url, { method = 'GET', headers, query, body, type } = {}) {
-    url = this.base + url
+    if (this.base) url = this.base + url
+    method = method.toUpperCase()
 
     if (query) {
       url = new URL(url)
@@ -37,20 +39,18 @@ class HttpApi {
         h.set(name, value)
       }
       headers = h
-    } else if (this.fetchOptions.headers) {
-      headers = new Headers(this.fetchOptions.headers)
     } else {
-      headers = new Headers()
+      headers = new Headers(this.fetchOptions.headers || headers || undefined)
     }
 
-    if (type === 'json') {
-      if (!headers.has('Content-Type')) {
-        headers.set('Content-Type', 'application/json')
-      }
+    if (['POST', 'PUT', 'PATCH'].includes(method)) {
+      if (type === 'json' || !type && body && body.constructor === Object) {
+        if (!headers.has('Content-Type')) {
+          headers.set('Content-Type', 'application/json')
+        }
 
-      body = JSON.stringify(body)
-    } else if (type === 'form') {
-      if (!(body instanceof FormData)) {
+        body = JSON.stringify(body)
+      } else if (type === 'form' && !(body instanceof FormData)) {
         const form = new FormData()
 
         for (const k in body) {
@@ -61,7 +61,7 @@ class HttpApi {
       }
     }
 
-    let options = this.fetchOptions ? { ...this.fetchOptions, method, headers, body } : { method, headers, body }
+    let options = { ...this.fetchOptions, method, headers, body }
 
     if (this.beforeFetch) {
       const modified = this.beforeFetch(url, options)
@@ -70,20 +70,28 @@ class HttpApi {
       }
     }
 
-    return fetch(url, options).then(res => {
-      if (!res.ok) throw res
+    const request = new Request(url, options)
 
-      let data
-      const contentType = res.headers.get('Content-Type')
+    return fetch(request).then(response => {
+      let body
+      const contentType = response.headers.get('Content-Type')
       if (contentType && contentType.includes('json')) {
-        data = res.json()
+        body = response.json()
       }
 
-      if (this.responseHandler) {
-        data = data ? data.then(d => this.responseHandler(res, d)) : Promise.resolve(this.responseHandler(res))
+      // if complete handler is given, you should check response.ok yourself in the handler
+      if (this.complete) {
+        return body
+          ? body.then(body => this.complete({ request, response, body }))
+          : this.complete({ request, response, body })
+      } else if (response.ok) {
+        return body || response
+      } else {
+        throw body || response
       }
-
-      return data || res
+    }, error => {
+      if (this.error) this.error({ request, error })
+      else throw error
     })
   }
 
@@ -95,29 +103,26 @@ class HttpApi {
     })
   }
 
-  post(url, body, { type = 'json', ...options } = {}) {
+  post(url, body, options) {
     return this.fetch(url, {
       method: 'POST',
       body,
-      type,
       ...options
     })
   }
 
-  put(url, body, { type = 'json', ...options } = {}) {
+  put(url, body, options) {
     return this.fetch(url, {
       method: 'PUT',
       body,
-      type,
       ...options
     })
   }
 
-  patch(url, body, { type = 'json', ...options } = {}) {
+  patch(url, body, options) {
     return this.fetch(url, {
       method: 'PATCH',
       body,
-      type,
       ...options
     })
   }
@@ -140,7 +145,7 @@ class HttpApi {
 
   options(url, query, options) {
     return this.fetch(url, {
-      method: 'options',
+      method: 'OPTIONS',
       query,
       ...options
     })

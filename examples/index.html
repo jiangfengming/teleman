@@ -21,7 +21,7 @@ const api = new HttpApi({
   }
 })
 
-api.get('/examples/index.html').then(text => {
+api.get('/examples/index.html', { queryA: 123 }).then(text => {
   console.log(text)
 })
 </script>

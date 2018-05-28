@@ -24,18 +24,6 @@
     return target;
   };
 
-  var objectWithoutProperties = function (obj, keys) {
-    var target = {};
-
-    for (var i in obj) {
-      if (keys.indexOf(i) >= 0) continue;
-      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-      target[i] = obj[i];
-    }
-
-    return target;
-  };
-
   var HttpApi = function () {
     function HttpApi() {
       var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -44,14 +32,14 @@
           _ref$fetchOptions = _ref.fetchOptions,
           fetchOptions = _ref$fetchOptions === undefined ? {} : _ref$fetchOptions,
           beforeFetch = _ref.beforeFetch,
-          responseHandler = _ref.responseHandler;
+          success = _ref.success;
 
       classCallCheck(this, HttpApi);
 
       this.base = base;
-      this.fetchOptions = fetchOptions;
+      this.fetchOptions = fetchOptions || {};
       this.beforeFetch = beforeFetch;
-      this.responseHandler = responseHandler;
+      this.complete = success;
     }
 
     HttpApi.prototype.fetch = function (_fetch) {
@@ -75,7 +63,8 @@
           body = _ref2.body,
           type = _ref2.type;
 
-      url = this.base + url;
+      if (this.base) url = this.base + url;
+      method = method.toUpperCase();
 
       if (query) {
         url = new URL(url);
@@ -138,20 +127,18 @@
           h.set(_name, _value);
         }
         headers = h;
-      } else if (this.fetchOptions.headers) {
-        headers = new Headers(this.fetchOptions.headers);
       } else {
-        headers = new Headers();
+        headers = new Headers(this.fetchOptions.headers || headers || undefined);
       }
 
-      if (type === 'json') {
-        if (!headers.has('Content-Type')) {
-          headers.set('Content-Type', 'application/json');
-        }
+      if (['POST', 'PUT', 'PATCH'].includes(method)) {
+        if (type === 'json' || !type && body && body.constructor === Object) {
+          if (!headers.has('Content-Type')) {
+            headers.set('Content-Type', 'application/json');
+          }
 
-        body = JSON.stringify(body);
-      } else if (type === 'form') {
-        if (!(body instanceof FormData)) {
+          body = JSON.stringify(body);
+        } else if (type === 'form' && !(body instanceof FormData)) {
           var form = new FormData();
 
           for (var k in body) {
@@ -162,7 +149,7 @@
         }
       }
 
-      var options = this.fetchOptions ? _extends({}, this.fetchOptions, { method: method, headers: headers, body: body }) : { method: method, headers: headers, body: body };
+      var options = _extends({}, this.fetchOptions, { method: method, headers: headers, body: body });
 
       if (this.beforeFetch) {
         var modified = this.beforeFetch(url, options);
@@ -172,22 +159,27 @@
         }
       }
 
-      return fetch(url, options).then(function (res) {
-        if (!res.ok) throw res;
+      var request = new Request(url, options);
 
-        var data = void 0;
-        var contentType = res.headers.get('Content-Type');
+      return fetch(request).then(function (response) {
+        var body = void 0;
+        var contentType = response.headers.get('Content-Type');
         if (contentType && contentType.includes('json')) {
-          data = res.json();
+          body = response.json();
         }
 
-        if (_this.responseHandler) {
-          data = data ? data.then(function (d) {
-            return _this.responseHandler(res, d);
-          }) : Promise.resolve(_this.responseHandler(res));
+        // if complete handler is given, you should check response.ok yourself in the handler
+        if (_this.complete) {
+          return body ? body.then(function (body) {
+            return _this.complete({ request: request, response: response, body: body });
+          }) : _this.complete({ request: request, response: response, body: body });
+        } else if (response.ok) {
+          return body || response;
+        } else {
+          throw body || response;
         }
-
-        return data || res;
+      }, function (error) {
+        if (_this.error) _this.error({ request: request, error: error });else throw error;
       });
     });
 
@@ -198,45 +190,24 @@
       }, options));
     };
 
-    HttpApi.prototype.post = function post(url, body) {
-      var _ref8 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var _ref8$type = _ref8.type,
-          type = _ref8$type === undefined ? 'json' : _ref8$type,
-          options = objectWithoutProperties(_ref8, ['type']);
-
+    HttpApi.prototype.post = function post(url, body, options) {
       return this.fetch(url, _extends({
         method: 'POST',
-        body: body,
-        type: type
+        body: body
       }, options));
     };
 
-    HttpApi.prototype.put = function put(url, body) {
-      var _ref9 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var _ref9$type = _ref9.type,
-          type = _ref9$type === undefined ? 'json' : _ref9$type,
-          options = objectWithoutProperties(_ref9, ['type']);
-
+    HttpApi.prototype.put = function put(url, body, options) {
       return this.fetch(url, _extends({
         method: 'PUT',
-        body: body,
-        type: type
+        body: body
       }, options));
     };
 
-    HttpApi.prototype.patch = function patch(url, body) {
-      var _ref10 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var _ref10$type = _ref10.type,
-          type = _ref10$type === undefined ? 'json' : _ref10$type,
-          options = objectWithoutProperties(_ref10, ['type']);
-
+    HttpApi.prototype.patch = function patch(url, body, options) {
       return this.fetch(url, _extends({
         method: 'PATCH',
-        body: body,
-        type: type
+        body: body
       }, options));
     };
 
@@ -256,7 +227,7 @@
 
     HttpApi.prototype.options = function options(url, query, _options) {
       return this.fetch(url, _extends({
-        method: 'options',
+        method: 'OPTIONS',
         query: query
       }, _options));
     };

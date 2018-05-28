@@ -31,6 +31,13 @@ const api = new HttpApi({
 api.get('/articles', { id: 123 }).then(data => {
   console.log(data)
 })
+
+// post JSON
+api.post('/articles', { title: 'Hello', content: '# Hello' })
+
+// multipart/form-data upload
+api.post('/upload', new FormData(document.forms[0]))
+api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
 ```
 
 ## APIs
@@ -58,7 +65,8 @@ function beforeFetch(url, options) {
   return { url, options }
 }
 ```
-`url` and `options` are parameters that would pass to `fetch()` function.  
+`url` and `options` are parameters that would pass to `fetch()` function.
+`options.headers` has been transformed to [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) object.  
 
 `responseHandler`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
 Function signature:
@@ -69,34 +77,35 @@ function responseHandler(response, body) { }
 
 `response` is the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.
 If the response type is JSON, `body` is the parsed JSON object, otherwise `body` is `undefined`.
-The return data will be the result of `httpApi.get()`, `httpApi.post()`, etc...
+The return data will be the result of the promise returned by `httpApi.fetch()`.
 
 The `responseHandler` is usually used to
 * Transforms the response object to the data type you want
 * Throws error if the business code is wrong.
 
+If `responseHandler` isn't provided, 
 ### httpApi.fetch(url, { method, headers, query, body, type })
 
 Params:  
-`url`: String. The url of the request. The final url will be `base + url + querystring`.
+`url`: String. The url of the request. The final url will be `base + url + querystring`.  
 `method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'. Defaults to 'GET'.
 `headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.  
 `query`: String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The URL queries. String/Object/Array type will be used to create a URLSearchParams instance.  
 `body`: Object | FormData | Blob | BufferSource | URLSearchParams | String. Any body that you want to add to your request.
 Note that a request using the GET or HEAD method cannot have a body.  
-`type`: String. 'json' or 'form'.  
-If type is 'json', `body` will be transformed with `JSON.stringify(body)`.  
-If type is 'form' and `body` is object, `body` will be transformed to `FormData`.
+`type`: String. `'json'` or `'form'`.
+* If `type` is not defined and `body` is a plain object, `body` will be transformed to JSON.
+* If `type` is `'json'`, `body` will be transformed to JSON.
+* If `type` is `'form'` and `body` is a key-value object, `body` will be transformed to `FormData` with `formData.append(name, value)`.
 
 #### HTTP method shortcut alias
 
 ```js
 httpApi.get(url, query, options)
-// json is the default body type
-httpApi.post(url, body, { type: 'json' })
-httpApi.put(url, body, { type: 'json' })
-httpApi.patch(url, body, { type: 'json' })
+httpApi.post(url, body, options)
+httpApi.put(url, body, options)
+httpApi.patch(url, body, options)
 httpApi.delete(url, query, options)
 httpApi.options(url, query, options)
 httpApi.head(url, query, options)
