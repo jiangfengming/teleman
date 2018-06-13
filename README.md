@@ -1,6 +1,7 @@
 # HttpApi
 
-[![codecov](https://codecov.io/gh/fenivana/HttpApi/branch/master/graph/badge.svg)](https://codecov.io/gh/fenivana/HttpApi)
+[![CircleCI](https://img.shields.io/circleci/project/github/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
+[![Codecov](https://img.shields.io/codecov/c/github/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
 [![npm](https://img.shields.io/npm/dm/@fenivana/http-api.svg)](https://www.npmjs.com/package/@fenivana/http-api)
 [![npm](https://img.shields.io/npm/v/@fenivana/http-api.svg)](https://www.npmjs.com/package/http-api)
 [![license](https://img.shields.io/github/license/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
