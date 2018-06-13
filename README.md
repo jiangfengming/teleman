@@ -1,4 +1,11 @@
 # HttpApi
+
+[![codecov](https://codecov.io/gh/fenivana/HttpApi/branch/master/graph/badge.svg)](https://codecov.io/gh/fenivana/HttpApi)
+[![npm](https://img.shields.io/npm/dm/@fenivana/http-api.svg)](https://www.npmjs.com/package/@fenivana/http-api)
+[![npm](https://img.shields.io/npm/v/@fenivana/http-api.svg)](https://www.npmjs.com/package/http-api)
+[![license](https://img.shields.io/github/license/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
+
+
 A cross-platform fetch API wrapper.
 
 ## Installation
