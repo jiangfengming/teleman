@@ -4,6 +4,7 @@ export default {
     format: 'cjs',
     file: 'dist/HttpApi.node.js',
     strict: false,
+    sourcemap: true,
     banner: `
 const { URL, URLSearchParams } = require('url')
 const FormData = require('form-data')

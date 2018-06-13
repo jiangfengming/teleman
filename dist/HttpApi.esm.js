@@ -26,14 +26,16 @@ var HttpApi = function () {
         _ref$fetchOptions = _ref.fetchOptions,
         fetchOptions = _ref$fetchOptions === undefined ? {} : _ref$fetchOptions,
         beforeFetch = _ref.beforeFetch,
-        success = _ref.success;
+        complete = _ref.complete,
+        error = _ref.error;
 
     classCallCheck(this, HttpApi);
 
     this.base = base;
     this.fetchOptions = fetchOptions || {};
     this.beforeFetch = beforeFetch;
-    this.complete = success;
+    this.complete = complete;
+    this.error = error;
   }
 
   HttpApi.prototype.fetch = function (_fetch) {
@@ -62,6 +64,7 @@ var HttpApi = function () {
 
     if (query) {
       url = new URL(url);
+
       if (!(query instanceof URLSearchParams)) {
         // filter null/undefined
         if (query.constructor === Object) {
@@ -69,13 +72,17 @@ var HttpApi = function () {
         }
 
         if (query instanceof Array) {
-          query = query.filter(function (_ref3) {
-            var value = _ref3[1];
-            return value != null;
-          });
-        }
+          var q = new URLSearchParams();
+          query.forEach(function (_ref3) {
+            var name = _ref3[0],
+                value = _ref3[1];
 
-        query = new URLSearchParams(query);
+            if (value != null) q.append(name, value);
+          });
+          query = q;
+        } else if (query.constructor === String) {
+          query = new URLSearchParams(query);
+        }
       }
 
       for (var _iterator = query.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -230,3 +237,4 @@ var HttpApi = function () {
 }();
 
 export default HttpApi;
+//# sourceMappingURL=HttpApi.esm.js.map

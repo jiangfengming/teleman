@@ -5,7 +5,8 @@ export default {
   output: {
     format: 'umd',
     name: 'HttpApi',
-    file: 'dist/HttpApi.umd.js'
+    file: 'dist/HttpApi.umd.js',
+    sourcemap: true
   },
   plugins: [
     babel()

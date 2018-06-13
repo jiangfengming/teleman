@@ -4,7 +4,8 @@ export default {
   input: 'src/index.js',
   output: {
     format: 'es',
-    file: 'dist/HttpApi.esm.js'
+    file: 'dist/HttpApi.esm.js',
+    sourcemap: true
   },
   plugins: [
     babel()

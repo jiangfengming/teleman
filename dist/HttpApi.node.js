@@ -6,11 +6,12 @@ const Headers = fetch.Headers
 const Request = fetch.Request
 
 class HttpApi {
-  constructor({ base = '', fetchOptions = {}, beforeFetch, success } = {}) {
+  constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
     this.base = base;
     this.fetchOptions = fetchOptions || {};
     this.beforeFetch = beforeFetch;
-    this.complete = success;
+    this.complete = complete;
+    this.error = error;
   }
 
   fetch(url, { method = 'GET', headers, query, body, type } = {}) {
@@ -19,6 +20,7 @@ class HttpApi {
 
     if (query) {
       url = new URL(url);
+
       if (!(query instanceof URLSearchParams)) {
         // filter null/undefined
         if (query.constructor === Object) {
@@ -26,10 +28,14 @@ class HttpApi {
         }
 
         if (query instanceof Array) {
-          query = query.filter(([, value]) => value != null);
+          const q = new URLSearchParams();
+          query.forEach(([name, value]) => {
+            if (value != null) q.append(name, value);
+          });
+          query = q;
+        } else if (query.constructor === String) {
+          query = new URLSearchParams(query);
         }
-
-        query = new URLSearchParams(query);
       }
 
       for (const [name, value] of query.entries()) {
@@ -159,3 +165,4 @@ class HttpApi {
 }
 
 module.exports = HttpApi;
+//# sourceMappingURL=HttpApi.node.js.map
