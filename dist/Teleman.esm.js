@@ -18,8 +18,8 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
-var HttpApi = function () {
-  function HttpApi() {
+var Teleman = function () {
+  function Teleman() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         _ref$base = _ref.base,
         base = _ref$base === undefined ? '' : _ref$base,
@@ -29,7 +29,7 @@ var HttpApi = function () {
         complete = _ref.complete,
         error = _ref.error;
 
-    classCallCheck(this, HttpApi);
+    classCallCheck(this, Teleman);
 
     this.base = base;
     this.fetchOptions = fetchOptions || {};
@@ -38,7 +38,7 @@ var HttpApi = function () {
     this.error = error;
   }
 
-  HttpApi.prototype.fetch = function (_fetch) {
+  Teleman.prototype.fetch = function (_fetch) {
     function fetch(_x) {
       return _fetch.apply(this, arguments);
     }
@@ -184,57 +184,57 @@ var HttpApi = function () {
     });
   });
 
-  HttpApi.prototype.get = function get$$1(url, query, options) {
+  Teleman.prototype.get = function get$$1(url, query, options) {
     return this.fetch(url, _extends({
       method: 'GET',
       query: query
     }, options));
   };
 
-  HttpApi.prototype.post = function post(url, body, options) {
+  Teleman.prototype.post = function post(url, body, options) {
     return this.fetch(url, _extends({
       method: 'POST',
       body: body
     }, options));
   };
 
-  HttpApi.prototype.put = function put(url, body, options) {
+  Teleman.prototype.put = function put(url, body, options) {
     return this.fetch(url, _extends({
       method: 'PUT',
       body: body
     }, options));
   };
 
-  HttpApi.prototype.patch = function patch(url, body, options) {
+  Teleman.prototype.patch = function patch(url, body, options) {
     return this.fetch(url, _extends({
       method: 'PATCH',
       body: body
     }, options));
   };
 
-  HttpApi.prototype.delete = function _delete(url, query, options) {
+  Teleman.prototype.delete = function _delete(url, query, options) {
     return this.fetch(url, _extends({
       method: 'DELETE',
       query: query
     }, options));
   };
 
-  HttpApi.prototype.head = function head(url, query, options) {
+  Teleman.prototype.head = function head(url, query, options) {
     return this.fetch(url, _extends({
       method: 'HEAD',
       query: query
     }, options));
   };
 
-  HttpApi.prototype.options = function options(url, query, _options) {
+  Teleman.prototype.options = function options(url, query, _options) {
     return this.fetch(url, _extends({
       method: 'OPTIONS',
       query: query
     }, _options));
   };
 
-  return HttpApi;
+  return Teleman;
 }();
 
-export default HttpApi;
-//# sourceMappingURL=HttpApi.esm.js.map
+export default Teleman;
+//# sourceMappingURL=Teleman.esm.js.map

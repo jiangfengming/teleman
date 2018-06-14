@@ -2,19 +2,19 @@
 // https://mochajs.org/#arrow-functions
 /* eslint prefer-arrow-callback: "off" */
 
-const HttpApi = require('../../')
+const Teleman = require('../../')
 const { assert } = require('chai')
 
-describe('HttpApi constructor', function() {
-  it('should create a HttpApi instance', function() {
-    const api = new HttpApi()
-    assert.instanceOf(api, HttpApi)
+describe('Teleman constructor', function() {
+  it('should create a Teleman instance', function() {
+    const api = new Teleman()
+    assert.instanceOf(api, Teleman)
   })
 })
 
 /*
-describe('HttpApi instance', function() {
-  const api = new HttpApi({
+describe('Teleman instance', function() {
+  const api = new Teleman({
     base: 'http://localhost:3000'
   })
 

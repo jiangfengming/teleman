@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 const Headers = fetch.Headers
 const Request = fetch.Request
 
-class HttpApi {
+class Teleman {
   constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
     this.base = base;
     this.fetchOptions = fetchOptions || {};
@@ -164,5 +164,5 @@ class HttpApi {
   }
 }
 
-module.exports = HttpApi;
-//# sourceMappingURL=HttpApi.node.js.map
+module.exports = Teleman;
+//# sourceMappingURL=Teleman.node.js.map

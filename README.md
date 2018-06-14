@@ -1,33 +1,32 @@
-# HttpApi
+# teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
-[![Codecov](https://img.shields.io/codecov/c/github/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
-[![npm](https://img.shields.io/npm/dm/@fenivana/http-api.svg)](https://www.npmjs.com/package/@fenivana/http-api)
-[![npm](https://img.shields.io/npm/v/@fenivana/http-api.svg)](https://www.npmjs.com/package/http-api)
-[![license](https://img.shields.io/github/license/fenivana/HttpApi.svg)](https://github.com/fenivana/HttpApi)
+[![CircleCI](https://img.shields.io/circleci/project/github/fenivana/teleman.svg)](https://github.com/fenivana/teleman)
+[![Codecov](https://img.shields.io/codecov/c/github/fenivana/teleman.svg)](https://github.com/fenivana/teleman)
+[![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
+[![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
+[![license](https://img.shields.io/github/license/fenivana/teleman.svg)](https://github.com/fenivana/teleman)
 
-
-A cross-platform fetch API wrapper.
+A browser and node.js fetch API wrapper.
 
 ## Installation
 
 ```sh
-npm i @fenivana/http-api
+npm i teleman
 ```
 
 ## Usage
 
 ```js
-import HttpApi from '@fenivana/http-api'
+import Teleman from 'teleman'
 
-const api = new HttpApi({
+const api = new Teleman({
   base: 'http://api.example.com/services',
   fetchOptions: {
     headers: {
       token: 'abcdefg123456'
     }
   },
-  responseHandler(res, body) {
+  complete(res, body) {
     if (body.code) {
       throw body
     } else {
@@ -48,11 +47,11 @@ api.post('/upload', new FormData(document.forms[0]))
 api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
 ```
 
-## APIs
+## Constructor
 
-### new HttpApi({ base, headers, fetchOptions, responseHandler })
+### new Teleman({ base, headers, fetchOptions, complete })
 
-Creates a HttpApi instance.
+Creates a Teleman instance.
 
 Params:  
 `base`: String. Optional. Base path of your http service. e.g., `https://api.example.com/services`.  
@@ -76,23 +75,27 @@ function beforeFetch(url, options) {
 `url` and `options` are parameters that would pass to `fetch()` function.
 `options.headers` has been transformed to [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) object.  
 
-`responseHandler`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
+`complete`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
 Function signature:
 
 ```js
-function responseHandler(response, body) { }
+function complete(response, body) { }
 ```
 
 `response` is the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.
 If the response type is JSON, `body` is the parsed JSON object, otherwise `body` is `undefined`.
-The return data will be the result of the promise returned by `httpApi.fetch()`.
+The return data will be the result of the promise returned by `teleman.fetch()`.
 
-The `responseHandler` is usually used to
+The `complete` is usually used to
 * Transforms the response object to the data type you want
 * Throws error if the business code is wrong.
 
-If `responseHandler` isn't provided, 
-### httpApi.fetch(url, { method, headers, query, body, type })
+If `complete` isn't provided, 
+
+
+## Instance methods
+
+### teleman.fetch(url, { method, headers, query, body, type })
 
 Params:  
 `url`: String. The url of the request. The final url will be `base + url + querystring`.  
@@ -110,13 +113,13 @@ Note that a request using the GET or HEAD method cannot have a body.
 #### HTTP method shortcut alias
 
 ```js
-httpApi.get(url, query, options)
-httpApi.post(url, body, options)
-httpApi.put(url, body, options)
-httpApi.patch(url, body, options)
-httpApi.delete(url, query, options)
-httpApi.options(url, query, options)
-httpApi.head(url, query, options)
+teleman.get(url, query, options)
+teleman.post(url, body, options)
+teleman.put(url, body, options)
+teleman.patch(url, body, options)
+teleman.delete(url, query, options)
+teleman.options(url, query, options)
+teleman.head(url, query, options)
 ```
 
 ## License

@@ -4,8 +4,8 @@ export default {
   input: 'src/index.js',
   output: {
     format: 'umd',
-    name: 'HttpApi',
-    file: 'dist/HttpApi.umd.js',
+    name: 'Teleman',
+    file: 'dist/Teleman.umd.js',
     sourcemap: true
   },
   plugins: [

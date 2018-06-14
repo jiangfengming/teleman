@@ -2,7 +2,7 @@ export default {
   input: 'src/index.js',
   output: {
     format: 'cjs',
-    file: 'dist/HttpApi.node.js',
+    file: 'dist/Teleman.node.js',
     strict: false,
     sourcemap: true,
     banner: `

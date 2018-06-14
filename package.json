@@ -1,9 +1,9 @@
 {
-  "name": "@fenivana/http-api",
-  "version": "0.1.4",
-  "description": "A cross-platform fetch API wrapper.",
-  "main": "dist/HttpApi.node.js",
-  "module": "dist/HttpApi.esm.js",
+  "name": "teleman",
+  "version": "0.1.0-dev",
+  "description": "A browser and node.js fetch API wrapper.",
+  "main": "dist/Teleman.node.js",
+  "module": "dist/Teleman.esm.js",
   "scripts": {
     "test-server": "node test/test-server",
     "test-it": "nyc --reporter=lcov mocha test/specs/*.js",
@@ -11,7 +11,7 @@
     "codecov": "codecov",
     "build": "rollup -c rollup.config.esm.js && rollup -c rollup.config.umd.js && rollup -c rollup.config.node.js"
   },
-  "repository": "git@github.com:fenivana/HttpApi.git",
+  "repository": "git@github.com:fenivana/teleman.git",
   "author": "Jiang Fengming <fenivana@noindoin.com>",
   "license": "MIT",
   "dependencies": {

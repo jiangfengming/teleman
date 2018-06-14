@@ -1,4 +1,4 @@
-class HttpApi {
+class Teleman {
   constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
     this.base = base
     this.fetchOptions = fetchOptions || {}
@@ -157,4 +157,4 @@ class HttpApi {
   }
 }
 
-export default HttpApi
+export default Teleman
