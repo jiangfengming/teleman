@@ -9,6 +9,13 @@ router.get('/', ctx => {
   ctx.body = 'Hello World!'
 })
 
+router.get('/options', ctx => {
+  ctx.body = {
+    url: ctx.url,
+    headers: ctx.headers
+  }
+})
+
 app.use(cors())
 app.use(router.routes())
 

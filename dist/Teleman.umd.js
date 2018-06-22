@@ -110,7 +110,7 @@
           url.searchParams.append(name, value);
         }
 
-        url = url.toString();
+        url = url.href;
       }
 
       if (this.fetchOptions.headers && headers) {
@@ -170,9 +170,16 @@
 
       return fetch(request).then(function (response) {
         var body = void 0;
-        var contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('json')) {
-          body = response.json();
+
+        if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+          var contentType = response.headers.get('Content-Type');
+          if (contentType) {
+            if (contentType.startsWith('application/json')) {
+              body = response.json();
+            } else if (contentType.startsWith('text/')) {
+              body = response.text();
+            }
+          }
         }
 
         // if complete handler is given, you should check response.ok yourself in the handler
