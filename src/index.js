@@ -80,8 +80,12 @@ class Teleman {
     return fetch(request).then(response => {
       let body
       const contentType = response.headers.get('Content-Type')
-      if (contentType && contentType.includes('json')) {
-        body = response.json()
+      if (contentType) {
+        if (contentType.startsWith('application/json')) {
+          body = response.json()
+        } else if (contentType.startsWith('text/')) {
+          body = response.text()
+        }
       }
 
       // if complete handler is given, you should check response.ok yourself in the handler
