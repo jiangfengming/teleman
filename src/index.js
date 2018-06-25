@@ -1,7 +1,7 @@
 class Teleman {
   constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
     this.base = base
-    this.fetchOptions = fetchOptions || {}
+    this.fetchOptions = fetchOptions
     this.beforeFetch = beforeFetch
     this.complete = complete
     this.error = error
