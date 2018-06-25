@@ -12,7 +12,7 @@ if (typeof window !== 'undefined') {
   const fetch = require('node-fetch')
   const Request = fetch.Request
   const Response = fetch.Response
-  test({ assert, Teleman, URL, URLSearchParams, FormData, Request, Response })
+  test({ assert, Teleman, URL, FormData, Request, Response })
 }
 
 function test({ assert, Teleman, URL, FormData, Request, Response }) {
