@@ -23,17 +23,17 @@ var Teleman = function () {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         _ref$base = _ref.base,
         base = _ref$base === undefined ? '' : _ref$base,
-        _ref$fetchOptions = _ref.fetchOptions,
-        fetchOptions = _ref$fetchOptions === undefined ? {} : _ref$fetchOptions,
-        beforeFetch = _ref.beforeFetch,
+        _ref$requestOptions = _ref.requestOptions,
+        requestOptions = _ref$requestOptions === undefined ? {} : _ref$requestOptions,
+        beforeCreateRequest = _ref.beforeCreateRequest,
         complete = _ref.complete,
         error = _ref.error;
 
     classCallCheck(this, Teleman);
 
     this.base = base;
-    this.fetchOptions = fetchOptions;
-    this.beforeFetch = beforeFetch;
+    this.requestOptions = requestOptions;
+    this.beforeCreateRequest = beforeCreateRequest;
     this.complete = complete;
     this.error = error;
   }
@@ -107,8 +107,8 @@ var Teleman = function () {
       url = url.href;
     }
 
-    if (this.fetchOptions.headers && headers) {
-      var h = new Headers(this.fetchOptions.headers);
+    if (this.requestOptions.headers && headers) {
+      var h = new Headers(this.requestOptions.headers);
       for (var _iterator2 = new Headers(headers).entries(), _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
         var _ref7;
 
@@ -129,7 +129,7 @@ var Teleman = function () {
       }
       headers = h;
     } else {
-      headers = new Headers(this.fetchOptions.headers || headers || undefined);
+      headers = new Headers(this.requestOptions.headers || headers || undefined);
     }
 
     if (['POST', 'PUT', 'PATCH'].includes(method)) {
@@ -150,10 +150,10 @@ var Teleman = function () {
       }
     }
 
-    var options = _extends({}, this.fetchOptions, { method: method, headers: headers, body: body });
+    var options = _extends({}, this.requestOptions, { method: method, headers: headers, body: body });
 
-    if (this.beforeFetch) {
-      var modified = this.beforeFetch(url, options);
+    if (this.beforeCreateRequest) {
+      var modified = this.beforeCreateRequest(url, options);
       if (modified && modified.url && modified.options) {
         url = modified.url;
         options = modified.options;

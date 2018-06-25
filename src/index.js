@@ -1,8 +1,8 @@
 class Teleman {
-  constructor({ base = '', fetchOptions = {}, beforeFetch, complete, error } = {}) {
+  constructor({ base = '', requestOptions = {}, beforeCreateRequest, complete, error } = {}) {
     this.base = base
-    this.fetchOptions = fetchOptions
-    this.beforeFetch = beforeFetch
+    this.requestOptions = requestOptions
+    this.beforeCreateRequest = beforeCreateRequest
     this.complete = complete
     this.error = error
   }
@@ -38,14 +38,14 @@ class Teleman {
       url = url.href
     }
 
-    if (this.fetchOptions.headers && headers) {
-      const h = new Headers(this.fetchOptions.headers)
+    if (this.requestOptions.headers && headers) {
+      const h = new Headers(this.requestOptions.headers)
       for (const [name, value] of new Headers(headers).entries()) {
         h.set(name, value)
       }
       headers = h
     } else {
-      headers = new Headers(this.fetchOptions.headers || headers || undefined)
+      headers = new Headers(this.requestOptions.headers || headers || undefined)
     }
 
     if (['POST', 'PUT', 'PATCH'].includes(method)) {
@@ -66,10 +66,10 @@ class Teleman {
       }
     }
 
-    let options = { ...this.fetchOptions, method, headers, body }
+    let options = { ...this.requestOptions, method, headers, body }
 
-    if (this.beforeFetch) {
-      const modified = this.beforeFetch(url, options)
+    if (this.beforeCreateRequest) {
+      const modified = this.beforeCreateRequest(url, options)
       if (modified && modified.url && modified.options) {
         ({ url, options } = modified)
       }

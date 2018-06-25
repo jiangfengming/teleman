@@ -1,7 +1,7 @@
 # teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/wallstreetcn/teleman.svg)](https://github.com/wallstreetcn/teleman)
-[![Codecov](https://img.shields.io/codecov/c/github/wallstreetcn/teleman.svg)](https://github.com/wallstreetcn/teleman)
+[![CircleCI](https://img.shields.io/circleci/project/github/wallstreetcn/teleman.svg)](https://circleci.com/gh/wallstreetcn/teleman)
+[![Codecov](https://img.shields.io/codecov/c/github/wallstreetcn/teleman.svg)](https://codecov.io/gh/wallstreetcn/teleman)
 [![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![license](https://img.shields.io/github/license/wallstreetcn/teleman.svg)](https://github.com/wallstreetcn/teleman)
@@ -21,17 +21,23 @@ import Teleman from 'teleman'
 
 const api = new Teleman({
   base: 'http://api.example.com/services',
-  fetchOptions: {
+
+  requestOptions: {
     headers: {
-      token: 'abcdefg123456'
+      'X-Token': 'abcdefg123456'
     }
   },
-  complete(res, body) {
-    if (body.code) {
-      throw body
+  
+  complete({ request, response, body }) {
+    if (response.ok) {
+      return body
     } else {
-      return body.data
+      throw body
     }
+  },
+
+  error({ request, error }) {
+    throw error
   }
 })
 
@@ -48,23 +54,29 @@ api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
 ```
 
 ## Constructor
-
-### new Teleman({ base, headers, fetchOptions, complete })
+```js
+new Teleman({ base, requestOptions, beforeCreateRequest, complete, error })
+```
 
 Creates a Teleman instance.
 
-Params:  
-`base`: String. Optional. Base path of your http service. e.g., `https://api.example.com/services`.  
-`fetchOptions`: Object. Optional. Default fetch options. See [fetch()](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch) for details.  
-`beforeFetch`: Function. Optional. Get called right before `fetch(url, options)`. Here is the last chance to modify `url` and `options`.  
-Function signature:
+Params:
+
+### base
+String. Optional. Base path of your http service. e.g., `https://api.example.com/services`.
+
+### requestOptions
+Object. Optional. Default options to create a request. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request) for details.
+
+### beforeCreateRequest
+Function. Optional. Get called right before [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request). Here is the last chance to modify `url` and `options`.
 
 ```js
-function beforeFetch(url, options) {
+function beforeCreateRequest(url, options) {
   console.log(url, options)
 
   if (store.user.token) {
-    options.headers.set('token', store.user.token)
+    options.headers.set('X-Token', store.user.token)
   }
   
   // if you modified the url or replaced the options object entirely, please return it back.
@@ -72,25 +84,30 @@ function beforeFetch(url, options) {
   return { url, options }
 }
 ```
-`url` and `options` are parameters that would pass to `fetch()` function.
+`url` and `options` are parameters that would pass to [new Request(url, options)](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request).  
 `options.headers` has been transformed to [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) object.  
 
-`complete`: Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
-Function signature:
+### complete
+Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
 
 ```js
-function complete(response, body) { }
+function complete({ request, response, body }) {
+
+}
 ```
 
-`response` is the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.
-If the response type is JSON, `body` is the parsed JSON object, otherwise `body` is `undefined`.
-The return data will be the result of the promise returned by `teleman.fetch()`.
+`request`: the [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object.  
+`response`: the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
+`body`: the response body. If response `content-type` is:
+* `application/json`: `body` is the parsed JSON object.
+* `text/*`: `body` is the string value of response body.
+* otherwise, `body` is undefined.
 
-The `complete` is usually used to
-* Transforms the response object to the data type you want
-* Throws error if the business code is wrong.
+The return value of `complete` handler will be the resolved value of `teleman.fetch()`.
 
-If `complete` isn't provided, 
+If `complete` isn't provided, `teleman.fetch()` will be resolved to:
+* `body` if response `content-type` is `application/json` or `text/*`.
+* `response` object otherwise.
 
 
 ## Instance methods
@@ -99,7 +116,7 @@ If `complete` isn't provided,
 
 Params:  
 `url`: String. The url of the request. The final url will be `base + url + querystring`.  
-`method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'. Defaults to 'GET'.
+`method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'. Defaults to 'GET'.  
 `headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.  
 `query`: String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The URL queries. String/Object/Array type will be used to create a URLSearchParams instance.  
@@ -110,7 +127,7 @@ Note that a request using the GET or HEAD method cannot have a body.
 * If `type` is `'json'`, `body` will be transformed to JSON.
 * If `type` is `'form'` and `body` is a key-value object, `body` will be transformed to `FormData` with `formData.append(name, value)`.
 
-#### HTTP method shortcut alias
+#### Request method aliases
 
 ```js
 teleman.get(url, query, options)

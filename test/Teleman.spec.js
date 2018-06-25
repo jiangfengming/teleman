@@ -100,13 +100,13 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
     before(function() {
       api = new Teleman({
         base: 'http://localhost:3000',
-        fetchOptions: {
+        requestOptions: {
           headers: {
             'X-Token': 'abcdef123456'
           }
         },
 
-        beforeFetch(url, options) {
+        beforeCreateRequest(url, options) {
           url = new URL(url)
           url.searchParams.append('baz', '3')
           url = url.href
@@ -141,7 +141,7 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
         assert.equal(result.request.headers.get('X-Token'), '123456abc')
       })
 
-      it('should inject the header by beforeFetch()', function() {
+      it('should inject the header by beforeCreateRequest()', function() {
         assert.equal(result.request.headers.get('X-Bar'), '2')
       })
 
@@ -172,13 +172,13 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
   })
 
   describe('post JSON', function() {
-    let fetchOptions
+    let requestOptions
 
     before(async function() {
       const api = new Teleman({
         base: 'http://localhost:3000',
-        beforeFetch(url, options) {
-          fetchOptions = options
+        beforeCreateRequest(url, options) {
+          requestOptions = options
         }
       })
 
@@ -186,22 +186,22 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
     })
 
     it('should convert plain object to JSON if type is not specified', function() {
-      assert.equal(fetchOptions.body, JSON.stringify({ foo: 1 }))
+      assert.equal(requestOptions.body, JSON.stringify({ foo: 1 }))
     })
 
     it('should have request content-type application/json', function() {
-      assert.equal(fetchOptions.headers.get('content-type'), 'application/json')
+      assert.equal(requestOptions.headers.get('content-type'), 'application/json')
     })
   })
 
   describe('post form data', function() {
-    let fetchOptions
+    let requestOptions
 
     before(async function() {
       const api = new Teleman({
         base: 'http://localhost:3000',
-        beforeFetch(url, options) {
-          fetchOptions = options
+        beforeCreateRequest(url, options) {
+          requestOptions = options
         }
       })
 
@@ -209,7 +209,7 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
     })
 
     it('should convert plain object to FormData if type is specified to "form"', function() {
-      assert.instanceOf(fetchOptions.body, FormData)
+      assert.instanceOf(requestOptions.body, FormData)
     })
   })
 
