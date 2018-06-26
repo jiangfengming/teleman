@@ -116,7 +116,7 @@ If `complete` isn't provided, `teleman.fetch()` will be resolved to:
 
 Params:  
 `url`: String. The url of the request. The final url will be `base + url + querystring`.  
-`method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'. Defaults to 'GET'.  
+`method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.  
 `headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.  
 `query`: String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The URL queries. String/Object/Array type will be used to create a URLSearchParams instance.  
