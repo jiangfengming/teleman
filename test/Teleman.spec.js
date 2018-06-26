@@ -56,7 +56,7 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
     describe('fetch unreachable address', function() {
       it('should throw error', async function() {
         try {
-          await api.get('http://127.0.0.1:65536/')
+          await api.get('http://127.0.0.1:65535/')
         } catch (e) {
           assert.instanceOf(e, Error)
         }
@@ -82,7 +82,7 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
         }
       })
 
-      await api.get('http://127.0.0.1:65536/')
+      await api.get('http://127.0.0.1:65535/')
     })
 
     it('should have request object', function() {
@@ -252,11 +252,6 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
     it('should fetch with HEAD method', async function() {
       const result = await api.head('/headers')
       assert.equal(result.request.method, 'HEAD')
-    })
-
-    it('should fetch with OPTIONS method', async function() {
-      const result = await api.options('/headers')
-      assert.equal(result.request.method, 'OPTIONS')
     })
   })
 }
