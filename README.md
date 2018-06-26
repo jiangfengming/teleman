@@ -48,7 +48,7 @@ api.get('/articles', { id: 123 }).then(data => {
 // post JSON
 api.post('/articles', { title: 'Hello', content: '# Hello' })
 
-// multipart/form-data upload
+// post with Content-Type: multipart/form-data
 api.post('/upload', new FormData(document.forms[0]))
 api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
 ```
