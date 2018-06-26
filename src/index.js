@@ -154,14 +154,6 @@ class Teleman {
       ...options
     })
   }
-
-  options(url, query, options) {
-    return this.fetch(url, {
-      method: 'OPTIONS',
-      query,
-      ...options
-    })
-  }
 }
 
 export default Teleman

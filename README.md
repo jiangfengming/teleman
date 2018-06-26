@@ -135,7 +135,6 @@ teleman.post(url, body, options)
 teleman.put(url, body, options)
 teleman.patch(url, body, options)
 teleman.delete(url, query, options)
-teleman.options(url, query, options)
 teleman.head(url, query, options)
 ```
 

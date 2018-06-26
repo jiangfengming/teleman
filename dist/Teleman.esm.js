@@ -233,13 +233,6 @@ var Teleman = function () {
     }, options));
   };
 
-  Teleman.prototype.options = function options(url, query, _options) {
-    return this.fetch(url, _extends({
-      method: 'OPTIONS',
-      query: query
-    }, _options));
-  };
-
   return Teleman;
 }();
 
