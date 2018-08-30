@@ -1,11 +1,10 @@
 import babel from 'rollup-plugin-babel'
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index.mjs',
   output: {
-    format: 'umd',
-    name: 'Teleman',
-    file: 'dist/Teleman.umd.js',
+    format: 'es',
+    file: 'dist/Teleman.mjs',
     sourcemap: true
   },
   plugins: [

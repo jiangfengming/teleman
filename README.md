@@ -53,6 +53,23 @@ api.post('/upload', new FormData(document.forms[0]))
 api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
 ```
 
+In Node.js environment, you need to add these global variables:
+
+```js
+const { URL, URLSearchParams } = require('url')
+global.URL = URL
+global.URLSearchParams = URLSearchParams
+
+// https://github.com/form-data/form-data
+global.FormData = require('form-data')
+
+// https://github.com/bitinn/node-fetch
+global.fetch = require('node-fetch')
+
+global.Headers = fetch.Headers
+global.Request = fetch.Request
+```
+
 ## Constructor
 ```js
 new Teleman({ base, requestOptions, beforeCreateRequest, complete, error })

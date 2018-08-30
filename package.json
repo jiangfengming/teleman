@@ -2,55 +2,49 @@
   "name": "teleman",
   "version": "0.2.3",
   "description": "A browser and node.js fetch API wrapper.",
-  "main": "dist/Teleman.node.js",
-  "module": "dist/Teleman.esm.js",
+  "main": "dist/Teleman.js",
+  "module": "dist/Teleman.mjs",
   "scripts": {
     "test-server": "node test/test-server",
     "test-it": "nyc --reporter=lcov mocha test/Teleman.spec.js",
     "test": "start-server-and-test test-server 3000 test-it",
     "codecov": "codecov",
-    "build": "rollup -c rollup.config.esm.js && rollup -c rollup.config.umd.js && rollup -c rollup.config.node.js"
+    "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.umd.mjs"
   },
   "repository": "git@github.com:wallstreetcn/teleman.git",
   "author": "Jiang Fengming <jiangfengming87@gmail.com>",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "form-data": "^2.3.2",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.2.0"
   },
   "devDependencies": {
-    "@koa/cors": "^2.2.1",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-3": "^6.24.1",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@koa/cors": "^2.2.2",
+    "babel-eslint": "^9.0.0",
     "chai": "^4.1.2",
-    "codecov": "^3.0.2",
-    "eslint": "^4.19.1",
-    "eslint-config-enough": "^0.3.3",
-    "koa": "^2.5.1",
+    "codecov": "^3.0.4",
+    "eslint": "^5.4.0",
+    "eslint-config-enough": "^0.3.4",
+    "koa": "^2.5.2",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
-    "rollup": "^0.59.4",
-    "rollup-plugin-babel": "^3.0.4",
-    "start-server-and-test": "^1.4.1"
+    "nyc": "^13.0.1",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "^4.0.2",
+    "start-server-and-test": "^1.7.0"
   },
   "babel": {
     "presets": [
       [
-        "env",
+        "@babel/preset-env",
         {
           "loose": true,
           "modules": false
         }
-      ],
-      "stage-3"
-    ],
-    "plugins": [
-      "external-helpers"
+      ]
     ]
   },
   "eslintConfig": {
