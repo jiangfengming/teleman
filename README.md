@@ -1,10 +1,10 @@
 # teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/wallstreetcn/teleman.svg)](https://circleci.com/gh/wallstreetcn/teleman)
-[![Codecov](https://img.shields.io/codecov/c/github/wallstreetcn/teleman.svg)](https://codecov.io/gh/wallstreetcn/teleman)
+[![CircleCI](https://img.shields.io/circleci/project/github/jiangfengming/teleman.svg)](https://circleci.com/gh/jiangfengming/teleman)
+[![Codecov](https://img.shields.io/codecov/c/github/jiangfengming/teleman.svg)](https://codecov.io/gh/jiangfengming/teleman)
 [![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
-[![license](https://img.shields.io/github/license/wallstreetcn/teleman.svg)](https://github.com/wallstreetcn/teleman)
+[![license](https://img.shields.io/github/license/jiangfengming/teleman.svg)](https://github.com/jiangfengming/teleman)
 
 A browser and node.js fetch API wrapper.
 
