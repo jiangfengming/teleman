@@ -11,7 +11,22 @@
     "codecov": "codecov",
     "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.umd.mjs"
   },
-  "repository": "git@github.com:jiangfengming/teleman.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jiangfengming/teleman.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jiangfengming/teleman/issues"
+  },
+  "homepage": "https://github.com/jiangfengming/teleman#readme",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "fetch",
+    "ajax",
+    "RESTful"
+  ],
   "author": "Jiang Fengming <jiangfengming87@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
