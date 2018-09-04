@@ -9,7 +9,10 @@ class Teleman {
 
   fetch(url, { method = 'GET', headers, query, body, type } = {}) {
     return new Promise(resolve => {
-      if (this.base) url = this.base + url
+      if (this.base && !/^http(s?):/.test(url)) {
+        url = this.base + url
+      }
+
       method = method.toUpperCase()
 
       if (query) {

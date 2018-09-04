@@ -259,4 +259,18 @@ function test({ assert, Teleman, URL, FormData, Request, Response }) {
       assert.equal(result.request.method, 'HEAD')
     })
   })
+
+  describe('fetch with absolute url', function() {
+    it('should not preprend base', async function() {
+      const api = new Teleman({
+        base: 'http://localhost:3000',
+        complete(result) {
+          return result
+        }
+      })
+
+      const result = await api.get('http://localhost:3000/headers')
+      assert.equal(result.request.url, 'http://localhost:3000/headers')
+    })
+  })
 }

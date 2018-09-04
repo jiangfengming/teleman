@@ -66,7 +66,10 @@
           type = _ref2.type;
 
       return new Promise(function (resolve) {
-        if (_this.base) url = _this.base + url;
+        if (_this.base && !/^http(s?):/.test(url)) {
+          url = _this.base + url;
+        }
+
         method = method.toUpperCase();
 
         if (query) {
