@@ -11,7 +11,7 @@
     "codecov": "codecov",
     "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.umd.mjs"
   },
-  "repository": "git@github.com:wallstreetcn/teleman.git",
+  "repository": "git@github.com:jiangfengming/teleman.git",
   "author": "Jiang Fengming <jiangfengming87@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
