@@ -27,6 +27,8 @@ jobs:
           - v1-dependencies-
 
       - run: yarn install
+      - run: yarn add node-fetch
+      - run: yarn add form-data
 
       - save_cache:
           paths:
