@@ -54,8 +54,5 @@
       "browser": true,
       "mocha": true
     }
-  },
-  "dependencies": {
-    "node-fetch": "^2.2.0"
   }
 }
