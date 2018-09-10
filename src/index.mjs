@@ -49,7 +49,7 @@ class Teleman {
         }
         headers = h
       } else {
-        headers = new Headers(this.requestOptions.headers || headers || undefined)
+        headers = new Headers(this.requestOptions.headers || headers || {})
       }
 
       if (['POST', 'PUT', 'PATCH'].includes(method)) {

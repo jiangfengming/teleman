@@ -132,7 +132,7 @@ function () {
 
         headers = h;
       } else {
-        headers = new Headers(_this.requestOptions.headers || headers || undefined);
+        headers = new Headers(_this.requestOptions.headers || headers || {});
       }
 
       if (['POST', 'PUT', 'PATCH'].includes(method)) {
