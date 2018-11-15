@@ -29,27 +29,23 @@
   ],
   "author": "Jiang Fengming <jiangfengming87@gmail.com>",
   "license": "MIT",
-  "peerDependencies": {
-    "form-data": "^2.3.2",
-    "node-fetch": "^2.2.0"
-  },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
     "@koa/cors": "^2.2.2",
-    "babel-eslint": "^9.0.0",
-    "chai": "^4.1.2",
+    "babel-eslint": "^10.0.1",
+    "chai": "^4.2.0",
     "codecov": "^3.1.0",
-    "eslint": "^5.5.0",
+    "eslint": "^5.9.0",
     "eslint-config-enough": "^0.3.4",
-    "koa": "^2.5.2",
+    "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
     "mocha": "^5.2.0",
-    "nyc": "^13.0.1",
-    "rollup": "^0.65.2",
+    "nyc": "^13.1.0",
+    "rollup": "^0.67.1",
     "rollup-plugin-babel": "^4.0.3",
-    "start-server-and-test": "^1.7.1"
+    "start-server-and-test": "^1.7.9"
   },
   "babel": {
     "presets": [
