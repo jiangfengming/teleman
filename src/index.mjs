@@ -1,17 +1,21 @@
 class Teleman {
-  constructor({ base = '', requestOptions = {}, beforeCreateRequest, complete, error } = {}) {
-    this.base = base
-    this.requestOptions = requestOptions
-    this.beforeCreateRequest = beforeCreateRequest
-    this.complete = complete
-    this.error = error
+  constructor({ urlPrefix } = {}) {
+    this.urlPrefix = urlPrefix
+    this.middlewares = []
   }
 
-  fetch(url, { method = 'GET', headers, query, body, type } = {}) {
+  use(middleware) {
+    this.middlewares.push(middleware)
+  }
+
+  fetch(url, { method = 'GET', headers, query, body } = {}) {
+    const ctx = {}
+
+    if (this.urlPrefix && !/^http(s?):/.test(url)) {
+      url = this.urlPrefix + url
+    }
+
     return new Promise(resolve => {
-      if (this.base && !/^http(s?):/.test(url)) {
-        url = this.base + url
-      }
 
       method = method.toUpperCase()
 
