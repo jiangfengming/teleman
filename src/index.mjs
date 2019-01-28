@@ -1,21 +1,22 @@
+import compose from 'koa-compose'
 class Teleman {
-  constructor({ urlPrefix } = {}) {
+  constructor({ urlPrefix, headers } = {}) {
     this.urlPrefix = urlPrefix
+    this.headers = headers
     this.middlewares = []
+    this.runMiddlewares = compose(this.middlewares)
   }
 
   use(middleware) {
     this.middlewares.push(middleware)
+    this.runMiddlewares = compose(this.middlewares)
   }
 
-  fetch(url, { method = 'GET', headers, query, body } = {}) {
-    const ctx = {}
-
-    if (this.urlPrefix && !/^http(s?):/.test(url)) {
-      url = this.urlPrefix + url
-    }
-
+  fetch(url, { method = 'GET', urlPrefix = this.urlPrefix, headers, query, body, responseType } = {}) {
     return new Promise(resolve => {
+      const originParams = { url, method, urlPrefix, headers, query, body, responseType }
+
+      if (urlPrefix) url = urlPrefix + url
 
       method = method.toUpperCase()
 
@@ -46,24 +47,26 @@ class Teleman {
         url = url.href
       }
 
-      if (this.requestOptions.headers && headers) {
-        const h = new Headers(this.requestOptions.headers)
+      if (this.headers && headers) {
+        const h = new Headers(this.headers)
         for (const [name, value] of new Headers(headers).entries()) {
           h.set(name, value)
         }
         headers = h
       } else {
-        headers = new Headers(this.requestOptions.headers || headers || {})
+        headers = new Headers(this.headers || headers || {})
       }
 
-      if (['POST', 'PUT', 'PATCH'].includes(method)) {
-        if (type === 'json' || !type && body && body.constructor === Object) {
+      if (body !== undefined && ['POST', 'PUT', 'PATCH'].includes(method)) {
+        const contentType = headers.get('Content-Type') || ''
+
+        if (!contentType || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json')
           }
 
           body = JSON.stringify(body)
-        } else if (type === 'form' && !(body instanceof FormData)) {
+        } else if (contentType.startsWith('multipart/form-data') && !(body instanceof FormData)) {
           const form = new FormData()
 
           for (const k in body) {
@@ -74,44 +77,46 @@ class Teleman {
         }
       }
 
-      let options = { ...this.requestOptions, method, headers, body }
-
-      if (this.beforeCreateRequest) {
-        const modified = this.beforeCreateRequest(url, options)
-        if (modified && modified.url && modified.options) {
-          ({ url, options } = modified)
+      const ctx = {
+        originParams,
+        req: {
+          url,
+          options: { method, headers, body }
         }
       }
 
-      const request = new Request(url, options)
+      resolve(this.runMiddlewares(ctx, () => {
+        ctx.request = new Request(ctx.req.url, ctx.req.options)
+        return fetch(ctx.request).then(response => {
+          ctx.response = response
 
-      resolve(fetch(request).then(response => {
-        let body
+          let body
 
-        if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-          const contentType = response.headers.get('Content-Type')
-          if (contentType) {
-            if (contentType.startsWith('application/json')) {
-              body = response.json()
-            } else if (contentType.startsWith('text/')) {
-              body = response.text()
+          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+            if (!responseType) responseType = response.headers.get('Content-Type')
+            if (responseType) {
+              if (responseType.startsWith('application/json')) {
+                body = response.json()
+              } else if (responseType.startsWith('text/')) {
+                body = response.text()
+              }
             }
           }
-        }
 
-        // if complete handler is given, you should check response.ok yourself in the handler
-        if (this.complete) {
-          return body
-            ? body.then(body => this.complete({ request, response, body }))
-            : this.complete({ request, response, body })
-        } else if (response.ok) {
-          return body || response
-        } else {
-          throw body || response
-        }
-      }, error => {
-        if (this.error) this.error({ request, error })
-        else throw error
+          // if complete handler is given, you should check response.ok yourself in the handler
+          if (this.complete) {
+            return body
+              ? body.then(body => this.complete({ request, response, body }))
+              : this.complete({ request, response, body })
+          } else if (response.ok) {
+            return body || response
+          } else {
+            throw body || response
+          }
+        }, error => {
+          if (this.error) this.error({ request, error })
+          else throw error
+        })
       }))
     })
   }
