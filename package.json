@@ -67,5 +67,8 @@
       "browser": true,
       "mocha": true
     }
+  },
+  "dependencies": {
+    "koa-compose": "^4.1.0"
   }
 }

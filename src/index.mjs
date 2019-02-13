@@ -1,4 +1,9 @@
 import compose from 'koa-compose'
+
+function jsonifyable(val) {
+  return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON
+}
+
 class Teleman {
   constructor({ urlPrefix, headers } = {}) {
     this.urlPrefix = urlPrefix
@@ -12,9 +17,9 @@ class Teleman {
     this.runMiddlewares = compose(this.middlewares)
   }
 
-  fetch(url, { method = 'GET', urlPrefix = this.urlPrefix, headers, query, body, responseType } = {}) {
+  fetch(url, { method = 'GET', urlPrefix = this.urlPrefix, headers, query, body, responseType, ...rest } = {}) {
     return new Promise(resolve => {
-      const originParams = { url, method, urlPrefix, headers, query, body, responseType }
+      const originParams = { url, method, urlPrefix, headers, query, body, responseType, ...rest }
 
       if (urlPrefix) url = urlPrefix + url
 
@@ -57,16 +62,16 @@ class Teleman {
         headers = new Headers(this.headers || headers || {})
       }
 
-      if (body !== undefined && ['POST', 'PUT', 'PATCH'].includes(method)) {
+      if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
         const contentType = headers.get('Content-Type') || ''
 
-        if (!contentType || contentType.startsWith('application/json')) {
+        if ((!contentType && jsonifyable(body)) || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json')
           }
 
           body = JSON.stringify(body)
-        } else if (contentType.startsWith('multipart/form-data') && !(body instanceof FormData)) {
+        } else if (contentType.startsWith('multipart/form-data') && body && body.constructor === Object) {
           const form = new FormData()
 
           for (const k in body) {
