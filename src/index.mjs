@@ -4,10 +4,43 @@ function jsonifyable(val) {
   return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON
 }
 
+function createURLSearchParams(query) {
+  if (query.constructor === String) {
+    return new URLSearchParams(query)
+  }
+
+  if (query.constructor === Object) {
+    query = Object.entries(query)
+  }
+
+  const q = new URLSearchParams()
+
+  for (const [name, value] of query) {
+    if (value != null) q.append(name, value)
+  }
+
+  return q
+}
+
+function createFormData(data) {
+  if (data.constructor === Object) {
+    data = Object.entries(data)
+  }
+
+  const f = new FormData()
+
+  for (const [name, value, filename] of data) {
+    if (value != null) f.append(name, value, filename)
+  }
+
+  return f
+}
+
 class Teleman {
-  constructor({ urlPrefix, headers } = {}) {
+  constructor({ urlPrefix, headers, responseType } = {}) {
     this.urlPrefix = urlPrefix
     this.headers = headers
+    this.responseType = responseType
     this.middlewares = []
     this.runMiddlewares = compose(this.middlewares)
   }
@@ -17,9 +50,17 @@ class Teleman {
     this.runMiddlewares = compose(this.middlewares)
   }
 
-  fetch(url, { method = 'GET', urlPrefix = this.urlPrefix, headers, query, body, responseType, ...rest } = {}) {
+  fetch(url, {
+    method = 'GET',
+    urlPrefix = this.urlPrefix,
+    headers,
+    query,
+    body,
+    responseType = this.responseType,
+    ...rest } = {}
+  ) {
     return new Promise(resolve => {
-      const originParams = { url, method, urlPrefix, headers, query, body, responseType, ...rest }
+      const originalParams = { url, method, urlPrefix, headers, query, body, responseType, ...rest }
 
       if (urlPrefix) url = urlPrefix + url
 
@@ -29,20 +70,7 @@ class Teleman {
         url = new URL(url)
 
         if (!(query instanceof URLSearchParams)) {
-          // filter null/undefined
-          if (query.constructor === Object) {
-            query = Object.entries(query)
-          }
-
-          if (query instanceof Array) {
-            const q = new URLSearchParams()
-            query.forEach(([name, value]) => {
-              if (value != null) q.append(name, value)
-            })
-            query = q
-          } else if (query.constructor === String) {
-            query = new URLSearchParams(query)
-          }
+          query = createURLSearchParams(query)
         }
 
         for (const [name, value] of query.entries()) {
@@ -71,19 +99,17 @@ class Teleman {
           }
 
           body = JSON.stringify(body)
-        } else if (contentType.startsWith('multipart/form-data') && body && body.constructor === Object) {
-          const form = new FormData()
-
-          for (const k in body) {
-            form.append(k, body[k])
-          }
-
-          body = form
+        } else if (contentType.startsWith('multipart/form-data') && body && !(body instanceof FormData)) {
+          body = createFormData(body)
+        } else if (contentType.startsWith('application/x-www-form-urlencoded') && body && !(body instanceof URLSearchParams)) {
+          body = createURLSearchParams(body)
         }
       }
 
       const ctx = {
-        originParams,
+        originalParams,
+        responseType,
+
         req: {
           url,
           options: { method, headers, body }
@@ -91,36 +117,34 @@ class Teleman {
       }
 
       resolve(this.runMiddlewares(ctx, () => {
-        ctx.request = new Request(ctx.req.url, ctx.req.options)
-        return fetch(ctx.request).then(response => {
+        const request = ctx.request = new Request(ctx.req.url, ctx.req.options)
+
+        return fetch(request).then(response => {
           ctx.response = response
 
           let body
 
-          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-            if (!responseType) responseType = response.headers.get('Content-Type')
+          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+            responseType = ctx.responseType || response.headers.get('Content-Type')
+
             if (responseType) {
               if (responseType.startsWith('application/json')) {
                 body = response.json()
               } else if (responseType.startsWith('text/')) {
                 body = response.text()
+              } else if (responseType.startsWith('multipart/form-data')) {
+                body = response.formData()
               }
             }
           }
 
-          // if complete handler is given, you should check response.ok yourself in the handler
-          if (this.complete) {
+          ctx.body = body
+
+          if (response.ok) {
             return body
-              ? body.then(body => this.complete({ request, response, body }))
-              : this.complete({ request, response, body })
-          } else if (response.ok) {
-            return body || response
           } else {
-            throw body || response
+            throw body
           }
-        }, error => {
-          if (this.error) this.error({ request, error })
-          else throw error
         })
       }))
     })
