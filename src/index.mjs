@@ -37,10 +37,10 @@ function createFormData(data) {
 }
 
 class Teleman {
-  constructor({ urlPrefix, headers, responseType } = {}) {
+  constructor({ urlPrefix, headers, readBody = true } = {}) {
     this.urlPrefix = urlPrefix
     this.headers = headers
-    this.responseType = responseType
+    this.readBody = readBody
     this.middleware = []
   }
 
@@ -53,19 +53,38 @@ class Teleman {
     urlPrefix = this.urlPrefix,
     headers,
     query,
+    params = {},
     body,
-    responseType = this.responseType,
-    use = [],
+    readBody = this.readBody,
+    use = this.middleware,
+    useBefore = [],
+    useAfter = [],
     ...rest } = {}
   ) {
     return new Promise(resolve => {
-      if (urlPrefix) url = urlPrefix + url
-
       method = method.toUpperCase()
 
-      if (query) {
-        url = new URL(url)
+      url = url.replace(/:([a-z]\w*)/ig, (_, w) => params[w])
 
+      const absURL = /^https?:\/\//
+      if (!absURL.test(url)) {
+        if (urlPrefix) url = urlPrefix + url
+
+        // urlPrefix also isn't absolute
+        if (!absURL.test(url)) {
+          try {
+            const a = document.createElement('a')
+            a.href = url
+            url = a.href
+          } catch (e) {
+            // node.js env
+          }
+        }
+      }
+
+      url = new URL(url)
+
+      if (query) {
         if (!(query instanceof URLSearchParams)) {
           query = createURLSearchParams(query)
         }
@@ -73,9 +92,9 @@ class Teleman {
         for (const [name, value] of query.entries()) {
           url.searchParams.append(name, value)
         }
-
-        url = url.href
       }
+
+      url = url.href
 
       if (this.headers && headers) {
         const h = new Headers(this.headers)
@@ -106,18 +125,18 @@ class Teleman {
       const ctx = {
         url,
         options: { method, headers, body },
-        responseType,
+        readBody,
         ...rest
       }
 
-      resolve(compose([...this.middleware, ...use])(ctx, () =>
+      resolve(compose([...useBefore, ...use, ...useAfter])(ctx, () =>
         fetch(ctx.url, ctx.options).then(response => {
           ctx.response = response
 
-          let body
+          let body = Promise.resolve()
 
-          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
-            responseType = ctx.responseType || response.headers.get('Content-Type')
+          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
+            const responseType = response.headers.get('Content-Type')
 
             if (responseType) {
               if (responseType.startsWith('application/json')) {
@@ -133,7 +152,7 @@ class Teleman {
           if (response.ok) {
             return body
           } else {
-            throw body
+            return body.then(e => { throw e })
           }
         })
       ))
@@ -188,5 +207,15 @@ class Teleman {
     })
   }
 }
+
+const instance = Teleman.default = new Teleman()
+Teleman.use = instance.use.bind(instance)
+Teleman.fetch = instance.fetch.bind(instance)
+Teleman.get = instance.get.bind(instance)
+Teleman.post = instance.post.bind(instance)
+Teleman.put = instance.put.bind(instance)
+Teleman.patch = instance.patch.bind(instance)
+Teleman.delete = instance.delete.bind(instance)
+Teleman.head = instance.head.bind(instance)
 
 export default Teleman

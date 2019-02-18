@@ -1,3 +1,5 @@
+import compose from 'koa-compose';
+
 function _extends() {
   _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -16,27 +18,107 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function jsonifyable(val) {
+  return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON;
+}
+
+function createURLSearchParams(query) {
+  if (query.constructor === String) {
+    return new URLSearchParams(query);
+  }
+
+  if (query.constructor === Object) {
+    query = Object.entries(query);
+  }
+
+  var q = new URLSearchParams();
+
+  for (var _iterator = query, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    var _ref;
+
+    if (_isArray) {
+      if (_i >= _iterator.length) break;
+      _ref = _iterator[_i++];
+    } else {
+      _i = _iterator.next();
+      if (_i.done) break;
+      _ref = _i.value;
+    }
+
+    var _ref2 = _ref,
+        name = _ref2[0],
+        value = _ref2[1];
+    if (value != null) q.append(name, value);
+  }
+
+  return q;
+}
+
+function createFormData(data) {
+  if (data.constructor === Object) {
+    data = Object.entries(data);
+  }
+
+  var f = new FormData();
+
+  for (var _iterator2 = data, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+    var _ref3;
+
+    if (_isArray2) {
+      if (_i2 >= _iterator2.length) break;
+      _ref3 = _iterator2[_i2++];
+    } else {
+      _i2 = _iterator2.next();
+      if (_i2.done) break;
+      _ref3 = _i2.value;
+    }
+
+    var _ref4 = _ref3,
+        name = _ref4[0],
+        value = _ref4[1],
+        filename = _ref4[2];
+    if (value != null) f.append(name, value, filename);
+  }
+
+  return f;
+}
+
 var Teleman =
 /*#__PURE__*/
 function () {
   function Teleman(_temp) {
-    var _ref = _temp === void 0 ? {} : _temp,
-        _ref$base = _ref.base,
-        base = _ref$base === void 0 ? '' : _ref$base,
-        _ref$requestOptions = _ref.requestOptions,
-        requestOptions = _ref$requestOptions === void 0 ? {} : _ref$requestOptions,
-        beforeCreateRequest = _ref.beforeCreateRequest,
-        complete = _ref.complete,
-        error = _ref.error;
+    var _ref5 = _temp === void 0 ? {} : _temp,
+        urlPrefix = _ref5.urlPrefix,
+        headers = _ref5.headers,
+        _ref5$readBody = _ref5.readBody,
+        readBody = _ref5$readBody === void 0 ? true : _ref5$readBody;
 
-    this.base = base;
-    this.requestOptions = requestOptions;
-    this.beforeCreateRequest = beforeCreateRequest;
-    this.complete = complete;
-    this.error = error;
+    this.urlPrefix = urlPrefix;
+    this.headers = headers;
+    this.readBody = readBody;
+    this.middleware = [];
   }
 
   var _proto = Teleman.prototype;
+
+  _proto.use = function use(middleware) {
+    this.middleware.push(middleware);
+  };
 
   _proto.fetch = function (_fetch) {
     function fetch(_x) {
@@ -51,162 +133,153 @@ function () {
   }(function (url, _temp2) {
     var _this = this;
 
-    var _ref2 = _temp2 === void 0 ? {} : _temp2,
-        _ref2$method = _ref2.method,
-        method = _ref2$method === void 0 ? 'GET' : _ref2$method,
-        headers = _ref2.headers,
-        query = _ref2.query,
-        body = _ref2.body,
-        type = _ref2.type;
+    var _ref6 = _temp2 === void 0 ? {} : _temp2,
+        _ref6$method = _ref6.method,
+        method = _ref6$method === void 0 ? 'GET' : _ref6$method,
+        _ref6$urlPrefix = _ref6.urlPrefix,
+        urlPrefix = _ref6$urlPrefix === void 0 ? this.urlPrefix : _ref6$urlPrefix,
+        headers = _ref6.headers,
+        query = _ref6.query,
+        _ref6$params = _ref6.params,
+        params = _ref6$params === void 0 ? {} : _ref6$params,
+        body = _ref6.body,
+        _ref6$readBody = _ref6.readBody,
+        readBody = _ref6$readBody === void 0 ? this.readBody : _ref6$readBody,
+        _ref6$use = _ref6.use,
+        use = _ref6$use === void 0 ? this.middleware : _ref6$use,
+        _ref6$useBefore = _ref6.useBefore,
+        useBefore = _ref6$useBefore === void 0 ? [] : _ref6$useBefore,
+        _ref6$useAfter = _ref6.useAfter,
+        useAfter = _ref6$useAfter === void 0 ? [] : _ref6$useAfter,
+        rest = _objectWithoutPropertiesLoose(_ref6, ["method", "urlPrefix", "headers", "query", "params", "body", "readBody", "use", "useBefore", "useAfter"]);
 
     return new Promise(function (resolve) {
-      if (_this.base && !/^http(s?):/.test(url)) {
-        url = _this.base + url;
+      method = method.toUpperCase();
+      url = url.replace(/:([a-z]\w*)/ig, function (_, w) {
+        return params[w];
+      });
+      var absURL = /^https?:\/\//;
+
+      if (!absURL.test(url)) {
+        if (urlPrefix) url = urlPrefix + url; // urlPrefix also isn't absolute
+
+        if (!absURL.test(url)) {
+          try {
+            var a = document.createElement('a');
+            a.href = url;
+            url = a.href;
+          } catch (e) {// node.js env
+          }
+        }
       }
 
-      method = method.toUpperCase();
+      url = new URL(url);
 
       if (query) {
-        url = new URL(url);
-
         if (!(query instanceof URLSearchParams)) {
-          // filter null/undefined
-          if (query.constructor === Object) {
-            query = Object.entries(query);
-          }
-
-          if (query instanceof Array) {
-            var q = new URLSearchParams();
-            query.forEach(function (_ref3) {
-              var name = _ref3[0],
-                  value = _ref3[1];
-              if (value != null) q.append(name, value);
-            });
-            query = q;
-          } else if (query.constructor === String) {
-            query = new URLSearchParams(query);
-          }
+          query = createURLSearchParams(query);
         }
 
-        for (var _iterator = query.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref4;
+        for (var _iterator3 = query.entries(), _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+          var _ref7;
 
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref4 = _iterator[_i++];
+          if (_isArray3) {
+            if (_i3 >= _iterator3.length) break;
+            _ref7 = _iterator3[_i3++];
           } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref4 = _i.value;
+            _i3 = _iterator3.next();
+            if (_i3.done) break;
+            _ref7 = _i3.value;
           }
 
-          var _ref5 = _ref4,
-              name = _ref5[0],
-              value = _ref5[1];
+          var _ref8 = _ref7,
+              name = _ref8[0],
+              value = _ref8[1];
           url.searchParams.append(name, value);
         }
-
-        url = url.href;
       }
 
-      if (_this.requestOptions.headers && headers) {
-        var h = new Headers(_this.requestOptions.headers);
+      url = url.href;
 
-        for (var _iterator2 = new Headers(headers).entries(), _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-          var _ref6;
+      if (_this.headers && headers) {
+        var h = new Headers(_this.headers);
 
-          if (_isArray2) {
-            if (_i2 >= _iterator2.length) break;
-            _ref6 = _iterator2[_i2++];
+        for (var _iterator4 = new Headers(headers).entries(), _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+          var _ref9;
+
+          if (_isArray4) {
+            if (_i4 >= _iterator4.length) break;
+            _ref9 = _iterator4[_i4++];
           } else {
-            _i2 = _iterator2.next();
-            if (_i2.done) break;
-            _ref6 = _i2.value;
+            _i4 = _iterator4.next();
+            if (_i4.done) break;
+            _ref9 = _i4.value;
           }
 
-          var _ref7 = _ref6,
-              name = _ref7[0],
-              value = _ref7[1];
+          var _ref10 = _ref9,
+              name = _ref10[0],
+              value = _ref10[1];
           h.set(name, value);
         }
 
         headers = h;
       } else {
-        headers = new Headers(_this.requestOptions.headers || headers || {});
+        headers = new Headers(_this.headers || headers || {});
       }
 
-      if (['POST', 'PUT', 'PATCH'].includes(method)) {
-        if (type === 'json' || !type && body && body.constructor === Object) {
+      if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
+        var contentType = headers.get('Content-Type') || '';
+
+        if (!contentType && jsonifyable(body) || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json');
           }
 
           body = JSON.stringify(body);
-        } else if (type === 'form' && !(body instanceof FormData)) {
-          var form = new FormData();
-
-          for (var k in body) {
-            form.append(k, body[k]);
-          }
-
-          body = form;
+        } else if (contentType.startsWith('multipart/form-data') && body && !(body instanceof FormData)) {
+          body = createFormData(body);
+        } else if (contentType.startsWith('application/x-www-form-urlencoded') && body && !(body instanceof URLSearchParams)) {
+          body = createURLSearchParams(body);
         }
       }
 
-      var options = _extends({}, _this.requestOptions, {
-        method: method,
-        headers: headers,
-        body: body
-      });
+      var ctx = _extends({
+        url: url,
+        options: {
+          method: method,
+          headers: headers,
+          body: body
+        },
+        readBody: readBody
+      }, rest);
 
-      if (_this.beforeCreateRequest) {
-        var modified = _this.beforeCreateRequest(url, options);
+      resolve(compose([].concat(useBefore, use, useAfter))(ctx, function () {
+        return fetch(ctx.url, ctx.options).then(function (response) {
+          ctx.response = response;
+          var body = Promise.resolve();
 
-        if (modified && modified.url && modified.options) {
-          url = modified.url;
-          options = modified.options;
-        }
-      }
+          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
+            var responseType = response.headers.get('Content-Type');
 
-      var request = new Request(url, options);
-      resolve(fetch(request).then(function (response) {
-        var body;
-
-        if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-          var contentType = response.headers.get('Content-Type');
-
-          if (contentType) {
-            if (contentType.startsWith('application/json')) {
-              body = response.json();
-            } else if (contentType.startsWith('text/')) {
-              body = response.text();
+            if (responseType) {
+              if (responseType.startsWith('application/json')) {
+                body = response.json();
+              } else if (responseType.startsWith('text/')) {
+                body = response.text();
+              } else if (responseType.startsWith('multipart/form-data')) {
+                body = response.formData();
+              }
             }
           }
-        } // if complete handler is given, you should check response.ok yourself in the handler
 
-
-        if (_this.complete) {
-          return body ? body.then(function (body) {
-            return _this.complete({
-              request: request,
-              response: response,
-              body: body
+          if (response.ok) {
+            return body;
+          } else {
+            return body.then(function (e) {
+              throw e;
             });
-          }) : _this.complete({
-            request: request,
-            response: response,
-            body: body
-          });
-        } else if (response.ok) {
-          return body || response;
-        } else {
-          throw body || response;
-        }
-      }, function (error) {
-        if (_this.error) _this.error({
-          request: request,
-          error: error
-        });else throw error;
+          }
+        });
       }));
     });
   });
@@ -255,6 +328,16 @@ function () {
 
   return Teleman;
 }();
+
+var instance = Teleman.default = new Teleman();
+Teleman.use = instance.use.bind(instance);
+Teleman.fetch = instance.fetch.bind(instance);
+Teleman.get = instance.get.bind(instance);
+Teleman.post = instance.post.bind(instance);
+Teleman.put = instance.put.bind(instance);
+Teleman.patch = instance.patch.bind(instance);
+Teleman.delete = instance.delete.bind(instance);
+Teleman.head = instance.head.bind(instance);
 
 export default Teleman;
 //# sourceMappingURL=Teleman.mjs.map

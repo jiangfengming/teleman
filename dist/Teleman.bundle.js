@@ -1,10 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('koa-compose')) :
-  typeof define === 'function' && define.amd ? define(['koa-compose'], factory) :
-  (global.Teleman = factory(global.compose));
-}(this, (function (compose) { 'use strict';
-
-  compose = compose && compose.hasOwnProperty('default') ? compose['default'] : compose;
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.Teleman = factory());
+}(this, (function () { 'use strict';
 
   function _extends() {
     _extends = Object.assign || function (target) {
@@ -37,6 +35,55 @@
     }
 
     return target;
+  }
+
+  /**
+   * Expose compositor.
+   */
+
+  var koaCompose = compose;
+  /**
+   * Compose `middleware` returning
+   * a fully valid middleware comprised
+   * of all those which are passed.
+   *
+   * @param {Array} middleware
+   * @return {Function}
+   * @api public
+   */
+
+  function compose(middleware) {
+    if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!');
+
+    for (const fn of middleware) {
+      if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!');
+    }
+    /**
+     * @param {Object} context
+     * @return {Promise}
+     * @api public
+     */
+
+
+    return function (context, next) {
+      // last called middleware #
+      let index = -1;
+      return dispatch(0);
+
+      function dispatch(i) {
+        if (i <= index) return Promise.reject(new Error('next() called multiple times'));
+        index = i;
+        let fn = middleware[i];
+        if (i === middleware.length) fn = next;
+        if (!fn) return Promise.resolve();
+
+        try {
+          return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+    };
   }
 
   function jsonifyable(val) {
@@ -259,7 +306,7 @@
           readBody: readBody
         }, rest);
 
-        resolve(compose([].concat(useBefore, use, useAfter))(ctx, function () {
+        resolve(koaCompose([].concat(useBefore, use, useAfter))(ctx, function () {
           return fetch(ctx.url, ctx.options).then(function (response) {
             ctx.response = response;
             var body = Promise.resolve();
@@ -348,4 +395,4 @@
   return Teleman;
 
 })));
-//# sourceMappingURL=Teleman.js.map
+//# sourceMappingURL=Teleman.bundle.js.map

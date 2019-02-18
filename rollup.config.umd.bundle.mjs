@@ -7,13 +7,12 @@ export default {
   output: {
     format: 'umd',
     name: 'Teleman',
-    file: 'dist/Teleman.js',
+    file: 'dist/Teleman.bundle.js',
     sourcemap: true
   },
   plugins: [
     resolve(),
     commonjs(),
     babel()
-  ],
-  external: ['koa-compose']
+  ]
 }
