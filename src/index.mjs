@@ -41,13 +41,11 @@ class Teleman {
     this.urlPrefix = urlPrefix
     this.headers = headers
     this.responseType = responseType
-    this.middlewares = []
-    this.runMiddlewares = compose(this.middlewares)
+    this.middleware = []
   }
 
   use(middleware) {
-    this.middlewares.push(middleware)
-    this.runMiddlewares = compose(this.middlewares)
+    this.middleware.push(middleware)
   }
 
   fetch(url, {
@@ -57,11 +55,10 @@ class Teleman {
     query,
     body,
     responseType = this.responseType,
+    use = [],
     ...rest } = {}
   ) {
     return new Promise(resolve => {
-      const originalParams = { url, method, urlPrefix, headers, query, body, responseType, ...rest }
-
       if (urlPrefix) url = urlPrefix + url
 
       method = method.toUpperCase()
@@ -107,24 +104,19 @@ class Teleman {
       }
 
       const ctx = {
-        originalParams,
+        url,
+        options: { method, headers, body },
         responseType,
-
-        req: {
-          url,
-          options: { method, headers, body }
-        }
+        ...rest
       }
 
-      resolve(this.runMiddlewares(ctx, () => {
-        const request = ctx.request = new Request(ctx.req.url, ctx.req.options)
-
-        return fetch(request).then(response => {
+      resolve(compose([...this.middleware, ...use])(ctx, () =>
+        fetch(ctx.url, ctx.options).then(response => {
           ctx.response = response
 
           let body
 
-          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+          if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
             responseType = ctx.responseType || response.headers.get('Content-Type')
 
             if (responseType) {
@@ -138,15 +130,13 @@ class Teleman {
             }
           }
 
-          ctx.body = body
-
           if (response.ok) {
             return body
           } else {
             throw body
           }
         })
-      }))
+      ))
     })
   }
 
