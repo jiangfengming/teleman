@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![license](https://img.shields.io/github/license/jiangfengming/teleman.svg)](https://github.com/jiangfengming/teleman)
 
-A browser and node.js fetch API wrapper.
+A tiny (~2kb after gzipped) `fetch` API wrapper.
 
 ## Installation
 
@@ -20,37 +20,18 @@ npm i teleman
 import Teleman from 'teleman'
 
 const api = new Teleman({
-  base: 'http://api.example.com/services',
-
-  requestOptions: {
-    headers: {
-      'X-Token': 'abcdefg123456'
-    }
-  },
-  
-  complete({ request, response, body }) {
-    if (response.ok) {
-      return body
-    } else {
-      throw body
-    }
-  },
-
-  error({ request, error }) {
-    throw error
-  }
+  urlPrefix: 'http://api.example.com'
 })
 
-api.get('/articles', { id: 123 }).then(data => {
-  console.log(data)
-})
+async function() {
+  const article = await api.get('/articles', { id: 123 })
 
-// post JSON
-api.post('/articles', { title: 'Hello', content: '# Hello' })
+  // post JSON
+  await api.post('/articles', { title: 'Hello', content: '# Hello' })
 
-// post with Content-Type: multipart/form-data
-api.post('/upload', new FormData(document.forms[0]))
-api.post('/upload', { file: inputElement.files[0] }, { type: 'form' })
+  // post with Content-Type: multipart/form-data
+  await api.post('/upload', new FormData(document.forms[0]))
+}
 ```
 
 In Node.js environment, you need to add these global variables:
@@ -65,87 +46,112 @@ global.FormData = require('form-data')
 
 // https://github.com/bitinn/node-fetch
 global.fetch = require('node-fetch')
-
 global.Headers = fetch.Headers
-global.Request = fetch.Request
 ```
 
 ## Constructor
 ```js
-new Teleman({ base, requestOptions, beforeCreateRequest, complete, error })
+new Teleman({ urlPrefix, headers, readBody = true})
 ```
 
 Creates a Teleman instance.
 
 Params:
 
-### base
-String. Optional. Base path of your http service. e.g., `https://api.example.com/services`.
+### urlPrefix
+String. Optional. A string prepend to `url`, if `url` is not start with `http(s)://`. 
 
-### requestOptions
-Object. Optional. Default options to create a request. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request) for details.
+### headers
+Object. Optional. Default headers. It can be a simple key-value object or
+[Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers) object.
 
-### beforeCreateRequest
-Function. Optional. Get called right before [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request). Here is the last chance to modify `url` and `options`.
+### readBody
+Boolean. Optional. Defaults to `true`. Whether to auto read the response body.
+According to `content-type` header of the response, it will use different methods:
+* `application/json`: `response.json()`
+* `text/*`: `response.text()`
+* `multipart/form-data`: `response.formData()`
+* Others: Won't read, manully handle the response in the middleware.
 
+If you turn off `readBody`, you need to handle response body in the middleware.
 ```js
-function beforeCreateRequest(url, options) {
-  console.log(url, options)
+const api = new Teleman({ readBody: false })
 
-  if (store.user.token) {
-    options.headers.set('X-Token', store.user.token)
-  }
-  
-  // if you modified the url or replaced the options object entirely, please return it back.
-  // otherwise you can omit the return statement.
-  return { url, options }
-}
+api.use(async(ctx, next) => {
+  await next()
+  return ctx.response.json()
+})
 ```
-`url` and `options` are parameters that would pass to [new Request(url, options)](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request).  
-`options.headers` has been transformed to [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) object.  
-
-### complete
-Function. Optional. The function to handle the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
-
-```js
-function complete({ request, response, body }) {
-
-}
-```
-
-`request`: the [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object.  
-`response`: the [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.  
-`body`: the response body. If response `content-type` is:
-* `application/json`: `body` is the parsed JSON object.
-* `text/*`: `body` is the string value of response body.
-* otherwise, `body` is undefined.
-
-The return value of `complete` handler will be the resolved value of `teleman.fetch()`.
-
-If `complete` isn't provided, `teleman.fetch()` will be resolved to:
-* `body` if response `content-type` is `application/json` or `text/*`.
-* `response` object otherwise.
-
 
 ## Instance methods
 
-### teleman.fetch(url, { method, headers, query, body, type })
+### teleman.fetch()
 
-Params:  
-`url`: String. The url of the request. The final url will be `base + url + querystring`.  
-`method`: String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.  
-`headers`: Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.  
-`query`: String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
-The URL queries. String/Object/Array type will be used to create a URLSearchParams instance.  
-`body`: Object | FormData | Blob | BufferSource | URLSearchParams | String. Any body that you want to add to your request.
-Note that a request using the GET or HEAD method cannot have a body.  
-`type`: String. `'json'` or `'form'`.
-* If `type` is not defined and `body` is a plain object, `body` will be transformed to JSON.
-* If `type` is `'json'`, `body` will be transformed to JSON.
-* If `type` is `'form'` and `body` is a key-value object, `body` will be transformed to `FormData` with `formData.append(name, value)`.
+signature:
+```js
+teleman.fetch(url, {
+  method = 'GET',
+  urlPrefix = this.urlPrefix,
+  headers,
+  query,
+  params = {},
+  body,
+  readBody = this.readBody,
+  use = this.middleware,
+  useBefore = [],
+  useAfter = [],
+  ...rest } = {}
+)
+```
 
-#### Request method aliases
+#### urlString
+The URL of the request.
 
+#### urlPrefix
+String. URL prefix.
+
+#### method
+String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.
+
+#### headers
+Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
+It will be merged with instance's default headers.
+
+#### query
+String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
+The query string appends to the URL. It takes the same format as 
+[URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams) constructor's param.
+
+#### params
+Object. URL path params.
+```js
+Teleman.fetch('/articles/:id', { params: { id: 1 } })
+```
+It will use `encodeURIComponent()` to encode the values.
+
+#### body
+Object | FormData | Blob | BufferSource | URLSearchParams | String. The request body.
+If body is a plain object, it will be convert to other type according to `content-type` of `headers` option.
+* not set or `application/json`: to JSON string, and set `content-type` if hasn't set.
+* `multipart/form-data`: to FormData.
+* `application/x-www-form-urlencoded`: to URLSearchParams.
+
+#### readBody
+Boolean. Whether to read response body.  
+
+#### use
+Array. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
+
+#### useBefore
+Array. Applies middleware functions before `use`.  
+
+#### useAfter
+Array. Applies middleware functions after `use`.  
+
+#### ...rest
+Other params will be set into the context object.
+
+### Shortcut methods
 ```js
 teleman.get(url, query, options)
 teleman.post(url, body, options)
@@ -154,6 +160,64 @@ teleman.patch(url, body, options)
 teleman.delete(url, query, options)
 teleman.head(url, query, options)
 ```
+
+### teleman.use(middleware)
+Add the given middleware function to the instance.
+
+```js
+api.use(async(ctx, next) => {
+  const start = Date.now()
+  const data = await next()
+  const ms = Date.now() - start
+  console.log(`${ctx.options.method} ${ctx.url} - ${ms}ms`)
+  return data
+})
+
+api.use(async(ctx, next) => {
+  try {
+    return await next()
+  } catch (e) {
+    alert(e ? e.message || e : 'fetch failed')
+    throw e
+  }
+})
+```
+
+ctx:
+```js
+{
+  url,
+  options: { method, headers, body },
+  readBody,
+  ...rest
+}
+```
+`url` and `options` are params of `fetch()`:
+```js
+`fetch(ctx.url, ctx.options)`
+```
+
+You can modify the context properties to interfere the request and response.
+
+A middleware function should receive response body from `next()`, and can optionally transform the data.
+Finially it should return the data.
+
+## Static methods
+You can also use Teleman directly without creating an instance.
+```js
+import Teleman from 'teleman'
+
+Teleman.get(url, query, options)
+Teleman.post(url, body, options)
+Teleman.put(url, body, options)
+Teleman.patch(url, body, options)
+Teleman.delete(url, query, options)
+Teleman.head(url, query, options)
+
+Teleman.use(middleware)
+```
+
+`Teleman.default` is the default instance.
 
 ## License
 

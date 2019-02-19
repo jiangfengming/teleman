@@ -1,9 +1,5 @@
 import compose from 'koa-compose'
 
-function jsonifyable(val) {
-  return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON
-}
-
 function createURLSearchParams(query) {
   if (query.constructor === String) {
     return new URLSearchParams(query)
@@ -64,7 +60,7 @@ class Teleman {
     return new Promise(resolve => {
       method = method.toUpperCase()
 
-      url = url.replace(/:([a-z]\w*)/ig, (_, w) => params[w])
+      url = url.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w]))
 
       const absURL = /^https?:\/\//
       if (!absURL.test(url)) {
@@ -109,7 +105,7 @@ class Teleman {
       if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
         const contentType = headers.get('Content-Type') || ''
 
-        if ((!contentType && jsonifyable(body)) || contentType.startsWith('application/json')) {
+        if ((!contentType && body && body.constructor === Object) || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json')
           }

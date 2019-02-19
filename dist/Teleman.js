@@ -1,8 +1,8 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('koa-compose')) :
   typeof define === 'function' && define.amd ? define(['koa-compose'], factory) :
-  (global.Teleman = factory(global.compose));
-}(this, (function (compose) { 'use strict';
+  (global = global || self, global.Teleman = factory(global.compose));
+}(this, function (compose) { 'use strict';
 
   compose = compose && compose.hasOwnProperty('default') ? compose['default'] : compose;
 
@@ -37,10 +37,6 @@
     }
 
     return target;
-  }
-
-  function jsonifyable(val) {
-    return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON;
   }
 
   function createURLSearchParams(query) {
@@ -162,7 +158,7 @@
       return new Promise(function (resolve) {
         method = method.toUpperCase();
         url = url.replace(/:([a-z]\w*)/ig, function (_, w) {
-          return params[w];
+          return encodeURIComponent(params[w]);
         });
         var absURL = /^https?:\/\//;
 
@@ -236,7 +232,7 @@
         if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
           var contentType = headers.get('Content-Type') || '';
 
-          if (!contentType && jsonifyable(body) || contentType.startsWith('application/json')) {
+          if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
             if (!headers.has('Content-Type')) {
               headers.set('Content-Type', 'application/json');
             }
@@ -347,5 +343,5 @@
 
   return Teleman;
 
-})));
+}));
 //# sourceMappingURL=Teleman.js.map

@@ -33,10 +33,6 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-function jsonifyable(val) {
-  return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON;
-}
-
 function createURLSearchParams(query) {
   if (query.constructor === String) {
     return new URLSearchParams(query);
@@ -156,7 +152,7 @@ function () {
     return new Promise(function (resolve) {
       method = method.toUpperCase();
       url = url.replace(/:([a-z]\w*)/ig, function (_, w) {
-        return params[w];
+        return encodeURIComponent(params[w]);
       });
       var absURL = /^https?:\/\//;
 
@@ -230,7 +226,7 @@ function () {
       if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
         var contentType = headers.get('Content-Type') || '';
 
-        if (!contentType && jsonifyable(body) || contentType.startsWith('application/json')) {
+        if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json');
           }

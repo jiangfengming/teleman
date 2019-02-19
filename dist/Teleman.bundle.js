@@ -1,8 +1,8 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.Teleman = factory());
-}(this, (function () { 'use strict';
+  (global = global || self, global.Teleman = factory());
+}(this, function () { 'use strict';
 
   function _extends() {
     _extends = Object.assign || function (target) {
@@ -55,7 +55,19 @@
   function compose(middleware) {
     if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!');
 
-    for (const fn of middleware) {
+    for (var _iterator = middleware, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+      var _ref;
+
+      if (_isArray) {
+        if (_i >= _iterator.length) break;
+        _ref = _iterator[_i++];
+      } else {
+        _i = _iterator.next();
+        if (_i.done) break;
+        _ref = _i.value;
+      }
+
+      var fn = _ref;
       if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!');
     }
     /**
@@ -67,13 +79,13 @@
 
     return function (context, next) {
       // last called middleware #
-      let index = -1;
+      var index = -1;
       return dispatch(0);
 
       function dispatch(i) {
         if (i <= index) return Promise.reject(new Error('next() called multiple times'));
         index = i;
-        let fn = middleware[i];
+        var fn = middleware[i];
         if (i === middleware.length) fn = next;
         if (!fn) return Promise.resolve();
 
@@ -84,10 +96,6 @@
         }
       }
     };
-  }
-
-  function jsonifyable(val) {
-    return val === null || [Object, Array, String, Number, Boolean].includes(val.constructor) || !!val.toJSON;
   }
 
   function createURLSearchParams(query) {
@@ -209,7 +217,7 @@
       return new Promise(function (resolve) {
         method = method.toUpperCase();
         url = url.replace(/:([a-z]\w*)/ig, function (_, w) {
-          return params[w];
+          return encodeURIComponent(params[w]);
         });
         var absURL = /^https?:\/\//;
 
@@ -283,7 +291,7 @@
         if (body !== undefined && !['GET', 'HEAD'].includes(method)) {
           var contentType = headers.get('Content-Type') || '';
 
-          if (!contentType && jsonifyable(body) || contentType.startsWith('application/json')) {
+          if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
             if (!headers.has('Content-Type')) {
               headers.set('Content-Type', 'application/json');
             }
@@ -394,5 +402,5 @@
 
   return Teleman;
 
-})));
+}));
 //# sourceMappingURL=Teleman.bundle.js.map
