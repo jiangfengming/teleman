@@ -180,7 +180,7 @@ api.use(async(ctx, next) => {
 })
 ```
 
-ctx:
+#### ctx
 ```js
 {
   url,
@@ -196,6 +196,7 @@ ctx:
 
 You can modify the context properties to interfere the request and response.
 
+#### next
 A middleware function should receive response body from `next()`, and can optionally transform the data.
 Finally it should return the data.
 
