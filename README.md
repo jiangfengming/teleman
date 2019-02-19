@@ -1,4 +1,4 @@
-# teleman
+# Teleman
 
 [![CircleCI](https://img.shields.io/circleci/project/github/jiangfengming/teleman.svg)](https://circleci.com/gh/jiangfengming/teleman)
 [![Codecov](https://img.shields.io/codecov/c/github/jiangfengming/teleman.svg)](https://codecov.io/gh/jiangfengming/teleman)
@@ -56,8 +56,6 @@ new Teleman({ urlPrefix, headers, readBody = true})
 
 Creates a Teleman instance.
 
-Params:
-
 ### urlPrefix
 String. Optional. A string prepend to `url`, if `url` is not start with `http(s)://`. 
 
@@ -87,7 +85,6 @@ api.use(async(ctx, next) => {
 
 ### teleman.fetch()
 
-signature:
 ```js
 teleman.fetch(url, {
   method = 'GET',
@@ -200,7 +197,7 @@ ctx:
 You can modify the context properties to interfere the request and response.
 
 A middleware function should receive response body from `next()`, and can optionally transform the data.
-Finially it should return the data.
+Finally it should return the data.
 
 ## Static methods
 You can also use Teleman directly without creating an instance.
