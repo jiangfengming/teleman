@@ -34,6 +34,7 @@ async function() {
 }
 ```
 
+### Node.js
 In Node.js environment, you need to add these global variables:
 
 ```js
@@ -101,52 +102,62 @@ teleman.fetch(url, {
 )
 ```
 
-#### urlString
+#### Parameters
+
+##### urlString
 The URL of the request.
 
-#### urlPrefix
+##### urlPrefix
 String. URL prefix.
 
-#### method
+##### method
 String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.
 
-#### headers
+##### headers
 Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
 It will be merged with instance's default headers.
 
-#### query
+##### query
 String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The query string appends to the URL. It takes the same format as 
 [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams) constructor's param.
 
-#### params
+##### params
 Object. URL path params.
 ```js
 Teleman.fetch('/articles/:id', { params: { id: 1 } })
 ```
 It will use `encodeURIComponent()` to encode the values.
 
-#### body
+##### body
 Object | FormData | Blob | BufferSource | URLSearchParams | String. The request body.
 If body is a plain object, it will be convert to other type according to `content-type` of `headers` option.
 * not set or `application/json`: to JSON string, and set `content-type` if hasn't set.
 * `multipart/form-data`: to FormData.
 * `application/x-www-form-urlencoded`: to URLSearchParams.
 
-#### readBody
+##### readBody
 Boolean. Whether to read response body.  
 
-#### use
+##### use
 Array. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
 
-#### useBefore
+##### useBefore
 Array. Applies middleware functions before `use`.  
 
-#### useAfter
+##### useAfter
 Array. Applies middleware functions after `use`.  
 
-#### ...rest
+##### ...rest
 Other params will be set into the context object.
+
+#### Returns
+`teleman.fetch()` returns a promise.
+* If `response.ok` is `true`, the promise will be resolved with the response body, otherwise it will be rejected with
+the response body.
+* If `readBody` is set to `false`, or `content-type` can't be handled, the promise will be resolved or rejected with
+no value, depending on `response.ok`. In this case, you should handle the response your self in the middleware.
+* If any error occurs, the promise will be rejected with the error.
 
 ### Shortcut methods
 ```js
@@ -185,6 +196,7 @@ api.use(async(ctx, next) => {
 {
   url,
   options: { method, headers, body },
+  response, // available after `await next()`
   readBody,
   ...rest
 }
