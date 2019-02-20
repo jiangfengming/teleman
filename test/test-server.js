@@ -2,6 +2,7 @@ const Koa = require('koa')
 const Router = require('koa-router')
 const cors = require('@koa/cors')
 const bodyParser = require('koa-bodyparser')
+const FormData = require('form-data')
 
 const app = new Koa()
 app.use(bodyParser())
@@ -22,6 +23,13 @@ router.all('/headers', ctx => {
 
 router.get('/bin', ctx => {
   ctx.body = Buffer.from('Hello World!')
+})
+
+router.get('/form', ctx => {
+  const form = new FormData()
+  form.append('foo', '123')
+  ctx.set('Content-Type', 'multipart/form-data')
+  ctx.body = form
 })
 
 router.post('/echo', ctx => {

@@ -35,15 +35,35 @@ function test({ assert, Teleman }) {
           bar: '2'
         }
       })
+
+      api2.use(async (ctx, next) => {
+        try {
+          return await next()
+        } catch (e) {
+          if (e instanceof Error) {
+            throw e
+          } else {
+            throw {
+              code: ctx.response.status,
+              message: e
+            }
+          }
+        }
+      })
     })
 
     it('should fetch with correct url', async function() {
       await api.fetch('/', { use: [ctx => assert.equal(ctx.url, 'http://localhost:3000/')] })
     })
 
-    it('should parse the response body if content-type is application/json', async function() {
+    it('should read the response body if content-type is application/json', async function() {
       const result = await api.fetch('/headers')
       assert.isObject(result)
+    })
+
+    it.skip('should read the response body if content-type is multipart/form-data', async function() {
+      const result = await api.fetch('/form')
+      assert.instanceOf(result, FormData)
     })
 
     it('query can be object', async function() {
@@ -106,6 +126,30 @@ function test({ assert, Teleman }) {
       } catch (e) {
         assert.instanceOf(e, Error)
       }
+    })
+
+    it('should run middleware', async function() {
+      try {
+        await api2.get('/404')
+      } catch (e) {
+        assert.deepEqual(e, { code: 404, message: 'Not Found' })
+      }
+    })
+
+    it('should request with PUT method', async function() {
+      await api.put('/', null, { use: [ctx => assert.equal(ctx.options.method, 'PUT')] })
+    })
+
+    it('should request with PATCH method', async function() {
+      await api.patch('/', null, { use: [ctx => assert.equal(ctx.options.method, 'PATCH')] })
+    })
+
+    it('should request with DELETE method', async function() {
+      await api.delete('/', null, { use: [ctx => assert.equal(ctx.options.method, 'DELETE')] })
+    })
+
+    it('should request with HEAD method', async function() {
+      await api.head('/', null, { use: [ctx => assert.equal(ctx.options.method, 'HEAD')] })
     })
   })
 }
