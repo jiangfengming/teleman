@@ -260,8 +260,6 @@
           }
         }
 
-        url = url.href;
-
         if (_this.headers && headers) {
           var h = new Headers(_this.headers);
 
@@ -315,7 +313,7 @@
         }, rest);
 
         resolve(koaCompose([].concat(useBefore, use, useAfter))(ctx, function () {
-          return fetch(ctx.url, ctx.options).then(function (response) {
+          return fetch(ctx.url.href, ctx.options).then(function (response) {
             ctx.response = response;
             var body = Promise.resolve();
 

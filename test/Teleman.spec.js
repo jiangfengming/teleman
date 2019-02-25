@@ -36,7 +36,7 @@ function test({ assert, Teleman }) {
         }
       })
 
-      api2.use(async (ctx, next) => {
+      api2.use(async(ctx, next) => {
         try {
           return await next()
         } catch (e) {
@@ -53,7 +53,7 @@ function test({ assert, Teleman }) {
     })
 
     it('should fetch with correct url', async function() {
-      await api.fetch('/', { use: [ctx => assert.equal(ctx.url, 'http://localhost:3000/')] })
+      await api.fetch('/', { use: [ctx => assert.equal(ctx.url.href, 'http://localhost:3000/')] })
     })
 
     it('should read the response body if content-type is application/json', async function() {
@@ -69,14 +69,14 @@ function test({ assert, Teleman }) {
     it('query can be object', async function() {
       await api.fetch('/', {
         query: { a: 1, b: 2 },
-        use: [ctx => assert.equal(ctx.url, 'http://localhost:3000/?a=1&b=2')]
+        use: [ctx => assert.equal(ctx.url.href, 'http://localhost:3000/?a=1&b=2')]
       })
     })
 
     it('query can be string', async function() {
       await api.fetch('/', {
         query: 'a=1&b=2',
-        use: [ctx => assert.equal(ctx.url, 'http://localhost:3000/?a=1&b=2')]
+        use: [ctx => assert.equal(ctx.url.href, 'http://localhost:3000/?a=1&b=2')]
       })
     })
 

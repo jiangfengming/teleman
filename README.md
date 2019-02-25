@@ -177,7 +177,7 @@ api.use(async(ctx, next) => {
   const start = Date.now()
   const data = await next()
   const ms = Date.now() - start
-  console.log(`${ctx.options.method} ${ctx.url} - ${ms}ms`)
+  console.log(`${ctx.options.method} ${ctx.url.href} - ${ms}ms`)
   return data
 })
 
@@ -194,7 +194,7 @@ api.use(async(ctx, next) => {
 #### ctx
 ```js
 {
-  url,
+  url, // URL object
   options: { method, headers, body },
   response, // available after `await next()`
   readBody,
@@ -203,7 +203,7 @@ api.use(async(ctx, next) => {
 ```
 `url` and `options` are params of `fetch()`:
 ```js
-`fetch(ctx.url, ctx.options)`
+`fetch(ctx.url.href, ctx.options)`
 ```
 
 You can modify the context properties to interfere the request and response.

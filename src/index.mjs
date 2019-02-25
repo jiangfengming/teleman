@@ -90,8 +90,6 @@ class Teleman {
         }
       }
 
-      url = url.href
-
       if (this.headers && headers) {
         const h = new Headers(this.headers)
         for (const [name, value] of new Headers(headers).entries()) {
@@ -126,7 +124,7 @@ class Teleman {
       }
 
       resolve(compose([...useBefore, ...use, ...useAfter])(ctx, () =>
-        fetch(ctx.url, ctx.options).then(response => {
+        fetch(ctx.url.href, ctx.options).then(response => {
           ctx.response = response
 
           let body = Promise.resolve()
