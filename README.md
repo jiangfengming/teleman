@@ -203,7 +203,7 @@ api.use(async(ctx, next) => {
 ```
 `url` and `options` are params of `fetch()`:
 ```js
-`fetch(ctx.url.href, ctx.options)`
+fetch(ctx.url.href, ctx.options)
 ```
 
 You can modify the context properties to interfere the request and response.
