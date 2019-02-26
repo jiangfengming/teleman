@@ -2,7 +2,7 @@
   "name": "teleman",
   "version": "0.4.1",
   "description": "A browser and node.js fetch API wrapper.",
-  "main": "dist/Teleman.js",
+  "main": "dist/Teleman",
   "scripts": {
     "test-server": "node test/test-server",
     "test-it": "nyc --reporter=lcov mocha test/Teleman.spec.js",
