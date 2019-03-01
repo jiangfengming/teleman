@@ -40,8 +40,12 @@ class Teleman {
     this.middleware = []
   }
 
-  use(middleware) {
-    this.middleware.push(middleware)
+  use(middleware, beginning = false) {
+    if (beginning) {
+      this.middleware.unshift(middleware)
+    } else {
+      this.middleware.push(middleware)
+    }
   }
 
   fetch(url, {

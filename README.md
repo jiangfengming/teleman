@@ -140,13 +140,13 @@ If body is a plain object, it will be convert to other type according to `conten
 Boolean. Whether to read response body.  
 
 ##### use
-Array. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
+Array[function]. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
 
 ##### useBefore
-Array. Applies middleware functions before `use`.  
+Array[function]. Applies middleware functions before `use`.  
 
 ##### useAfter
-Array. Applies middleware functions after `use`.  
+Array[function]. Applies middleware functions after `use`.  
 
 ##### ...rest
 Other params will be set into the context object.
@@ -169,8 +169,15 @@ teleman.delete(url, query, options)
 teleman.head(url, query, options)
 ```
 
-### teleman.use(middleware)
+### teleman.use(middleware, beginning = false)
 Add the given middleware function to the instance.
+
+#### Parameters
+##### middleware
+Function. The middleware function to use.
+
+##### beginning
+Boolean. Inserts the middleware function at the beginning of middleware chain. Defaults to `false`.
 
 ```js
 api.use(async(ctx, next) => {

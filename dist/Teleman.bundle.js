@@ -177,8 +177,16 @@
 
     var _proto = Teleman.prototype;
 
-    _proto.use = function use(middleware) {
-      this.middleware.push(middleware);
+    _proto.use = function use(middleware, beginning) {
+      if (beginning === void 0) {
+        beginning = false;
+      }
+
+      if (beginning) {
+        this.middleware.unshift(middleware);
+      } else {
+        this.middleware.push(middleware);
+      }
     };
 
     _proto.fetch = function (_fetch) {
