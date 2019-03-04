@@ -8,7 +8,7 @@
     "test-it": "nyc --reporter=lcov mocha test/Teleman.spec.js",
     "test": "start-server-and-test test-server 3000 test-it",
     "codecov": "codecov",
-    "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.umd.mjs && rollup -c rollup.config.umd.bundle.mjs"
+    "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.cjs.mjs && rollup -c rollup.config.umd.bundle.mjs"
   },
   "repository": {
     "type": "git",
