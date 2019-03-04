@@ -12,12 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/jiangfengming/teleman.git"
+    "url": "git+ssh://git@github.com/kasha-io/teleman.git"
   },
   "bugs": {
-    "url": "https://github.com/jiangfengming/teleman/issues"
+    "url": "https://github.com/kasha-io/teleman/issues"
   },
-  "homepage": "https://github.com/jiangfengming/teleman#readme",
+  "homepage": "https://github.com/kasha-io/teleman#readme",
   "directories": {
     "test": "test"
   },
