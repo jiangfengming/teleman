@@ -1,10 +1,10 @@
 # Teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/jiangfengming/teleman.svg)](https://circleci.com/gh/jiangfengming/teleman)
-[![Codecov](https://img.shields.io/codecov/c/github/jiangfengming/teleman.svg)](https://codecov.io/gh/jiangfengming/teleman)
+[![CircleCI](https://img.shields.io/circleci/project/github/kasha-io/teleman.svg)](https://circleci.com/gh/kasha-io/teleman)
+[![Codecov](https://img.shields.io/codecov/c/github/kasha-io/teleman.svg)](https://codecov.io/gh/kasha-io/teleman)
 [![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
-[![license](https://img.shields.io/github/license/jiangfengming/teleman.svg)](https://github.com/jiangfengming/teleman)
+[![license](https://img.shields.io/github/license/kasha-io/teleman.svg)](https://github.com/kasha-io/teleman)
 
 A tiny (~2kb after gzipped) `fetch` API wrapper.
 
