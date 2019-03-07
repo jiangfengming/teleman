@@ -33,8 +33,18 @@ function createFormData(data) {
 }
 
 class Teleman {
-  constructor({ urlPrefix, headers, readBody = true } = {}) {
-    this.urlPrefix = urlPrefix
+  constructor({ base, headers, readBody = true } = {}) {
+    if (base) {
+      this.base = base
+    } else {
+      try {
+        // defaults to document.baseURI in browser
+        this.base = document.baseURI
+      } catch (e) {
+        // in node.js, ignore
+      }
+    }
+
     this.headers = headers
     this.readBody = readBody
     this.middleware = []
@@ -50,7 +60,7 @@ class Teleman {
 
   fetch(url, {
     method = 'GET',
-    urlPrefix = this.urlPrefix,
+    base = this.base,
     headers,
     query,
     params = {},
@@ -63,26 +73,7 @@ class Teleman {
   ) {
     return new Promise(resolve => {
       method = method.toUpperCase()
-
-      url = url.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w]))
-
-      const absURL = /^https?:\/\//
-      if (!absURL.test(url)) {
-        if (urlPrefix) url = urlPrefix + url
-
-        // urlPrefix also isn't absolute
-        if (!absURL.test(url)) {
-          try {
-            const a = document.createElement('a')
-            a.href = url
-            url = a.href
-          } catch (e) {
-            // node.js env
-          }
-        }
-      }
-
-      url = new URL(url)
+      url = new URL(url.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base)
 
       if (query) {
         if (!(query instanceof URLSearchParams)) {

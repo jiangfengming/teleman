@@ -164,12 +164,21 @@
   function () {
     function Teleman(_temp) {
       var _ref5 = _temp === void 0 ? {} : _temp,
-          urlPrefix = _ref5.urlPrefix,
+          base = _ref5.base,
           headers = _ref5.headers,
           _ref5$readBody = _ref5.readBody,
           readBody = _ref5$readBody === void 0 ? true : _ref5$readBody;
 
-      this.urlPrefix = urlPrefix;
+      if (base) {
+        this.base = base;
+      } else {
+        try {
+          // defaults to document.baseURI in browser
+          this.base = document.baseURI;
+        } catch (e) {// in node.js, ignore
+        }
+      }
+
       this.headers = headers;
       this.readBody = readBody;
       this.middleware = [];
@@ -205,8 +214,8 @@
       var _ref6 = _temp2 === void 0 ? {} : _temp2,
           _ref6$method = _ref6.method,
           method = _ref6$method === void 0 ? 'GET' : _ref6$method,
-          _ref6$urlPrefix = _ref6.urlPrefix,
-          urlPrefix = _ref6$urlPrefix === void 0 ? this.urlPrefix : _ref6$urlPrefix,
+          _ref6$base = _ref6.base,
+          base = _ref6$base === void 0 ? this.base : _ref6$base,
           headers = _ref6.headers,
           query = _ref6.query,
           _ref6$params = _ref6.params,
@@ -220,29 +229,13 @@
           useBefore = _ref6$useBefore === void 0 ? [] : _ref6$useBefore,
           _ref6$useAfter = _ref6.useAfter,
           useAfter = _ref6$useAfter === void 0 ? [] : _ref6$useAfter,
-          rest = _objectWithoutPropertiesLoose(_ref6, ["method", "urlPrefix", "headers", "query", "params", "body", "readBody", "use", "useBefore", "useAfter"]);
+          rest = _objectWithoutPropertiesLoose(_ref6, ["method", "base", "headers", "query", "params", "body", "readBody", "use", "useBefore", "useAfter"]);
 
       return new Promise(function (resolve) {
         method = method.toUpperCase();
-        url = url.replace(/:([a-z]\w*)/ig, function (_, w) {
+        url = new URL(url.replace(/:([a-z]\w*)/ig, function (_, w) {
           return encodeURIComponent(params[w]);
-        });
-        var absURL = /^https?:\/\//;
-
-        if (!absURL.test(url)) {
-          if (urlPrefix) url = urlPrefix + url; // urlPrefix also isn't absolute
-
-          if (!absURL.test(url)) {
-            try {
-              var a = document.createElement('a');
-              a.href = url;
-              url = a.href;
-            } catch (e) {// node.js env
-            }
-          }
-        }
-
-        url = new URL(url);
+        }), base);
 
         if (query) {
           if (!(query instanceof URLSearchParams)) {

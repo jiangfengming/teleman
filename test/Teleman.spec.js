@@ -25,11 +25,11 @@ function test({ assert, Teleman }) {
 
     before(function() {
       api = new Teleman({
-        urlPrefix: 'http://localhost:3000'
+        base: 'http://localhost:3000'
       })
 
       api2 = new Teleman({
-        urlPrefix: 'http://localhost:3000',
+        base: 'http://localhost:3000',
         headers: {
           foo: '1',
           bar: '2'

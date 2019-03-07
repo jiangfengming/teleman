@@ -20,7 +20,7 @@ npm i teleman
 import Teleman from 'teleman'
 
 const api = new Teleman({
-  urlPrefix: 'http://api.example.com'
+  base: 'http://api.example.com'
 })
 
 async function() {
@@ -52,20 +52,20 @@ global.Headers = fetch.Headers
 
 ## Constructor
 ```js
-new Teleman({ urlPrefix, headers, readBody = true})
+new Teleman({ base, headers, readBody = true})
 ```
 
 Creates a Teleman instance.
 
-### urlPrefix
-String. Optional. A string prepend to `url`, if `url` is not start with `http(s)://`. 
+### base
+`String`. Optional. Base URL. In browser, it's default value is `document.baseURI`.
 
 ### headers
-Object. Optional. Default headers. It can be a simple key-value object or
+`Object`. Optional. Default headers. It can be a simple key-value object or
 [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers) object.
 
 ### readBody
-Boolean. Optional. Defaults to `true`. Whether to auto read the response body.
+`Boolean`. Optional. Defaults to `true`. Whether to auto read the response body.
 According to `content-type` header of the response, it will use different methods:
 * `application/json`: `response.json()`
 * `text/*`: `response.text()`
@@ -89,7 +89,7 @@ api.use(async(ctx, next) => {
 ```js
 teleman.fetch(url, {
   method = 'GET',
-  urlPrefix = this.urlPrefix,
+  base = this.base,
   headers,
   query,
   params = {},
@@ -104,49 +104,50 @@ teleman.fetch(url, {
 
 #### Parameters
 
-##### urlString
-The URL of the request.
+##### url
+`String`. The URL of the request. If it's a relative URL, it's relative to `base` parameter.
 
-##### urlPrefix
-String. URL prefix.
+##### base
+`String`. Base URL. The request URL will be `new URL(url, base)`.
 
 ##### method
-String. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.
+`String`. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.
 
 ##### headers
-Object | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
+`Object` | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
 It will be merged with instance's default headers.
 
 ##### query
-String | Object | Array | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
+`String` | `Object` | `Array` | [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 The query string appends to the URL. It takes the same format as 
 [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams) constructor's param.
 
 ##### params
-Object. URL path params.
+`Object`. URL path params.
 ```js
 Teleman.fetch('/articles/:id', { params: { id: 1 } })
 ```
 It will use `encodeURIComponent()` to encode the values.
 
 ##### body
-Object | FormData | Blob | BufferSource | URLSearchParams | String. The request body.
-If body is a plain object, it will be convert to other type according to `content-type` of `headers` option.
-* not set or `application/json`: to JSON string, and set `content-type` if hasn't set.
+`Object` | `FormData` | `Blob` | `BufferSource` | `URLSearchParams` | `String`. The request body.
+If the body is a plain object, it will be converted to other type according to `content-type` of `headers`:
+* not set: to JSON string, and set `content-type` to `application/json`.
+* `application/json`: to JSON string.
 * `multipart/form-data`: to FormData.
 * `application/x-www-form-urlencoded`: to URLSearchParams.
 
 ##### readBody
-Boolean. Whether to read response body.  
+`Boolean`. Whether to read response body.  
 
 ##### use
-Array[function]. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
+`Array[function]`. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
 
 ##### useBefore
-Array[function]. Applies middleware functions before `use`.  
+`Array[function]`. Applies middleware functions before `use`.  
 
 ##### useAfter
-Array[function]. Applies middleware functions after `use`.  
+`Array[function]`. Applies middleware functions after `use`.  
 
 ##### ...rest
 Other params will be set into the context object.
@@ -174,10 +175,10 @@ Add the given middleware function to the instance.
 
 #### Parameters
 ##### middleware
-Function. The middleware function to use.
+`Function`. The middleware function to use.
 
 ##### beginning
-Boolean. Inserts the middleware function at the beginning of middleware chain. Defaults to `false`.
+`Boolean`. Inserts the middleware function at the beginning of middleware chain. Defaults to `false`.
 
 ```js
 api.use(async(ctx, next) => {
