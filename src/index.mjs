@@ -33,7 +33,7 @@ function createFormData(data) {
 }
 
 class Teleman {
-  constructor({ base, headers, readBody = true } = {}) {
+  constructor({ base, headers, readBody = true, throwFailedResponse = true } = {}) {
     if (base) {
       this.base = base
     } else {
@@ -47,6 +47,7 @@ class Teleman {
 
     this.headers = headers
     this.readBody = readBody
+    this.throwFailedResponse = throwFailedResponse
     this.middleware = []
   }
 
@@ -66,6 +67,7 @@ class Teleman {
     params = {},
     body,
     readBody = this.readBody,
+    throwFailedResponse = this.throwFailedResponse,
     use = this.middleware,
     useBefore = [],
     useAfter = [],
@@ -138,7 +140,7 @@ class Teleman {
             }
           }
 
-          if (response.ok) {
+          if (response.ok || !throwFailedResponse) {
             return body
           } else {
             return body.then(e => { throw e })

@@ -8,6 +8,12 @@
 
 A tiny (~2kb after gzipped) `fetch` API wrapper.
 
+## Features
+* Tiny, only about 2kb after gzipped.
+* Supports middleware.
+* Returns decoded response body by default.
+* Handles `response.ok` for you.
+
 ## Installation
 
 ```sh
@@ -55,7 +61,7 @@ const Teleman = require('teleman')
 
 ## Constructor
 ```js
-new Teleman({ base, headers, readBody = true})
+new Teleman({ base, headers, readBody = true, throwFailedResponse = true})
 ```
 
 Creates a Teleman instance.
@@ -85,6 +91,9 @@ api.use(async(ctx, next) => {
 })
 ```
 
+### throwFailedResponse
+`Boolean`. Optional. Defaults to `true`. If `response.ok` is `false`, throw the response body.
+
 ## Instance methods
 
 ### teleman.fetch()
@@ -98,6 +107,7 @@ teleman.fetch(url, {
   params = {},
   body,
   readBody = this.readBody,
+  throwFailedResponse = this.throwFailedResponse,
   use = this.middleware,
   useBefore = [],
   useAfter = [],
@@ -142,6 +152,9 @@ If the body is a plain object, it will be converted to other type according to `
 
 ##### readBody
 `Boolean`. Whether to read response body.  
+
+##### throwFailedResponse
+`Boolean`. Whether to throw when `response.ok` is `false`.
 
 ##### use
 `Array[function]`. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  

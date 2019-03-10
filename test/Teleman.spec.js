@@ -128,6 +128,10 @@ function test({ assert, Teleman }) {
       }
     })
 
+    it('should not throw if throwFailedResponse set to false', async function() {
+      await api.fetch('/err.bin', { throwFailedResponse: false })
+    })
+
     it('should run middleware', async function() {
       try {
         await api2.get('/404')

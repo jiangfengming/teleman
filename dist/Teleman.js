@@ -106,7 +106,9 @@ function () {
         base = _ref5.base,
         headers = _ref5.headers,
         _ref5$readBody = _ref5.readBody,
-        readBody = _ref5$readBody === void 0 ? true : _ref5$readBody;
+        readBody = _ref5$readBody === void 0 ? true : _ref5$readBody,
+        _ref5$throwFailedResp = _ref5.throwFailedResponse,
+        throwFailedResponse = _ref5$throwFailedResp === void 0 ? true : _ref5$throwFailedResp;
 
     if (base) {
       this.base = base;
@@ -120,6 +122,7 @@ function () {
 
     this.headers = headers;
     this.readBody = readBody;
+    this.throwFailedResponse = throwFailedResponse;
     this.middleware = [];
   }
 
@@ -162,13 +165,15 @@ function () {
         body = _ref6.body,
         _ref6$readBody = _ref6.readBody,
         readBody = _ref6$readBody === void 0 ? this.readBody : _ref6$readBody,
+        _ref6$throwFailedResp = _ref6.throwFailedResponse,
+        throwFailedResponse = _ref6$throwFailedResp === void 0 ? this.throwFailedResponse : _ref6$throwFailedResp,
         _ref6$use = _ref6.use,
         use = _ref6$use === void 0 ? this.middleware : _ref6$use,
         _ref6$useBefore = _ref6.useBefore,
         useBefore = _ref6$useBefore === void 0 ? [] : _ref6$useBefore,
         _ref6$useAfter = _ref6.useAfter,
         useAfter = _ref6$useAfter === void 0 ? [] : _ref6$useAfter,
-        rest = _objectWithoutPropertiesLoose(_ref6, ["method", "base", "headers", "query", "params", "body", "readBody", "use", "useBefore", "useAfter"]);
+        rest = _objectWithoutPropertiesLoose(_ref6, ["method", "base", "headers", "query", "params", "body", "readBody", "throwFailedResponse", "use", "useBefore", "useAfter"]);
 
     return new Promise(function (resolve) {
       method = method.toUpperCase();
@@ -271,7 +276,7 @@ function () {
             }
           }
 
-          if (response.ok) {
+          if (response.ok || !throwFailedResponse) {
             return body;
           } else {
             return body.then(function (e) {
