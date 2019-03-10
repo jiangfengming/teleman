@@ -35,19 +35,22 @@ async function() {
 ```
 
 ### Node.js
-In Node.js environment, you need to add these global variables:
+In Node.js, you need to include some polyfills ([node-fetch](https://github.com/bitinn/node-fetch) and
+[form-data](https://github.com/form-data/form-data)).
+[teleman-node](https://github.com/kasha-io/teleman-node) has included all the polyfills for you.
+```
+npm i teleman teleman-node
+```
 
+Then, import Teleman via
 ```js
-const { URL, URLSearchParams } = require('url')
-global.URL = URL
-global.URLSearchParams = URLSearchParams
+const Teleman = require('teleman-node')
+```
 
-// https://github.com/form-data/form-data
-global.FormData = require('form-data')
-
-// https://github.com/bitinn/node-fetch
-global.fetch = require('node-fetch')
-global.Headers = fetch.Headers
+Or
+```js
+require('teleman-node')
+const Teleman = require('teleman')
 ```
 
 ## Constructor
