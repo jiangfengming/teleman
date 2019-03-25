@@ -251,7 +251,7 @@ Teleman.head(url, query, options)
 Teleman.use(middleware)
 ```
 
-`Teleman.default` is the default instance.
+`Teleman.singleton` is the default singleton instance.
 
 ## License
 

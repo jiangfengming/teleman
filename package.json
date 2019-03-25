@@ -32,13 +32,13 @@
     "koa-compose": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
-    "@koa/cors": "^2.2.3",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "@koa/cors": "^3.0.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
     "codecov": "^3.2.0",
-    "eslint": "^5.15.1",
+    "eslint": "^5.15.3",
     "eslint-config-enough": "^0.3.4",
     "form-data": "^2.3.3",
     "koa": "^2.7.0",
@@ -47,11 +47,11 @@
     "mocha": "^6.0.2",
     "node-fetch": "^2.3.0",
     "nyc": "^13.3.0",
-    "rollup": "^1.6.0",
+    "rollup": "^1.7.3",
     "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "start-server-and-test": "^1.7.11"
+    "start-server-and-test": "^1.7.12"
   },
   "eslintConfig": {
     "extends": "enough",

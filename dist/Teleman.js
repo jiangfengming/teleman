@@ -333,15 +333,15 @@ function () {
   return Teleman;
 }();
 
-var instance = Teleman.default = new Teleman();
-Teleman.use = instance.use.bind(instance);
-Teleman.fetch = instance.fetch.bind(instance);
-Teleman.get = instance.get.bind(instance);
-Teleman.post = instance.post.bind(instance);
-Teleman.put = instance.put.bind(instance);
-Teleman.patch = instance.patch.bind(instance);
-Teleman.delete = instance.delete.bind(instance);
-Teleman.head = instance.head.bind(instance);
+var singleton = Teleman.singleton = new Teleman();
+Teleman.use = singleton.use.bind(singleton);
+Teleman.fetch = singleton.fetch.bind(singleton);
+Teleman.get = singleton.get.bind(singleton);
+Teleman.post = singleton.post.bind(singleton);
+Teleman.put = singleton.put.bind(singleton);
+Teleman.patch = singleton.patch.bind(singleton);
+Teleman.delete = singleton.delete.bind(singleton);
+Teleman.head = singleton.head.bind(singleton);
 
 module.exports = Teleman;
 //# sourceMappingURL=Teleman.js.map
