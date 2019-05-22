@@ -2,10 +2,11 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script src="../dist/Teleman.bundle.js"></script>
 </head>
 <body>
-<script>
+<script type="module">
+import Teleman from '../dist/Teleman.mjs'
+
 (async function() {
   const api = new Teleman()
   api.use(async(ctx, next) => {

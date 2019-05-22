@@ -1,5 +1,3 @@
-import compose from 'koa-compose';
-
 function _extends() {
   _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -31,6 +29,67 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   }
 
   return target;
+}
+
+/**
+ * Expose compositor.
+ */
+
+var koaCompose = compose;
+/**
+ * Compose `middleware` returning
+ * a fully valid middleware comprised
+ * of all those which are passed.
+ *
+ * @param {Array} middleware
+ * @return {Function}
+ * @api public
+ */
+
+function compose(middleware) {
+  if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!');
+
+  for (var _iterator = middleware, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    var _ref;
+
+    if (_isArray) {
+      if (_i >= _iterator.length) break;
+      _ref = _iterator[_i++];
+    } else {
+      _i = _iterator.next();
+      if (_i.done) break;
+      _ref = _i.value;
+    }
+
+    var fn = _ref;
+    if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!');
+  }
+  /**
+   * @param {Object} context
+   * @return {Promise}
+   * @api public
+   */
+
+
+  return function (context, next) {
+    // last called middleware #
+    var index = -1;
+    return dispatch(0);
+
+    function dispatch(i) {
+      if (i <= index) return Promise.reject(new Error('next() called multiple times'));
+      index = i;
+      var fn = middleware[i];
+      if (i === middleware.length) fn = next;
+      if (!fn) return Promise.resolve();
+
+      try {
+        return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+  };
 }
 
 function createURLSearchParams(query) {
@@ -253,7 +312,7 @@ function () {
         readBody: readBody
       }, rest);
 
-      resolve(compose([].concat(useBefore, use, useAfter))(ctx, function () {
+      resolve(koaCompose([].concat(useBefore, use, useAfter))(ctx, function () {
         return fetch(ctx.url.href, ctx.options).then(function (response) {
           ctx.response = response;
           var body = Promise.resolve();
@@ -312,7 +371,7 @@ function () {
     }, options));
   };
 
-  _proto.delete = function _delete(url, query, options) {
+  _proto["delete"] = function _delete(url, query, options) {
     return this.fetch(url, _extends({
       method: 'DELETE',
       query: query
@@ -336,7 +395,7 @@ Teleman.get = singleton.get.bind(singleton);
 Teleman.post = singleton.post.bind(singleton);
 Teleman.put = singleton.put.bind(singleton);
 Teleman.patch = singleton.patch.bind(singleton);
-Teleman.delete = singleton.delete.bind(singleton);
+Teleman["delete"] = singleton["delete"].bind(singleton);
 Teleman.head = singleton.head.bind(singleton);
 
 export default Teleman;

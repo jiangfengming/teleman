@@ -8,7 +8,7 @@
     "test-it": "nyc --reporter=lcov mocha test/Teleman.spec.js",
     "test": "start-server-and-test test-server 3000 test-it",
     "codecov": "codecov",
-    "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.cjs.mjs && rollup -c rollup.config.umd.bundle.mjs"
+    "build": "rollup -c rollup.config.esm.js && rollup -c rollup.config.cjs.js"
   },
   "repository": {
     "type": "git",
@@ -32,26 +32,26 @@
     "koa-compose": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@koa/cors": "^3.0.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
-    "codecov": "^3.2.0",
-    "eslint": "^5.15.3",
+    "codecov": "^3.5.0",
+    "eslint": "^5.16.0",
     "eslint-config-enough": "^0.3.4",
     "form-data": "^2.3.3",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
-    "mocha": "^6.0.2",
-    "node-fetch": "^2.3.0",
-    "nyc": "^13.3.0",
-    "rollup": "^1.7.3",
+    "mocha": "^6.1.4",
+    "node-fetch": "^2.6.0",
+    "nyc": "^14.1.1",
+    "rollup": "^1.12.3",
     "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^9.2.2",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "start-server-and-test": "^1.7.12"
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "start-server-and-test": "^1.9.0"
   },
   "eslintConfig": {
     "extends": "enough",
