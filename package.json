@@ -1,6 +1,6 @@
 {
   "name": "teleman",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A browser and node.js fetch API wrapper.",
   "main": "dist/Teleman",
   "scripts": {
