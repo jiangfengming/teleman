@@ -118,7 +118,10 @@ function createURLSearchParams(query) {
     var _ref2 = _ref,
         name = _ref2[0],
         value = _ref2[1];
-    if (value != null) q.append(name, value);
+
+    if (value != null) {
+      q.append(name, value);
+    }
   }
 
   return q;
@@ -147,7 +150,10 @@ function createFormData(data) {
         name = _ref4[0],
         value = _ref4[1],
         filename = _ref4[2];
-    if (value != null) f.append(name, value, filename);
+
+    if (value != null) {
+      f.append(name, value, filename);
+    }
   }
 
   return f;
@@ -241,46 +247,16 @@ function () {
           query = createURLSearchParams(query);
         }
 
-        for (var _iterator3 = query.entries(), _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-          var _ref7;
-
-          if (_isArray3) {
-            if (_i3 >= _iterator3.length) break;
-            _ref7 = _iterator3[_i3++];
-          } else {
-            _i3 = _iterator3.next();
-            if (_i3.done) break;
-            _ref7 = _i3.value;
-          }
-
-          var _ref8 = _ref7,
-              name = _ref8[0],
-              value = _ref8[1];
-          url.searchParams.append(name, value);
-        }
+        query.forEach(function (value, name) {
+          return url.searchParams.append(name, value);
+        });
       }
 
       if (_this.headers && headers) {
         var h = new Headers(_this.headers);
-
-        for (var _iterator4 = new Headers(headers).entries(), _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-          var _ref9;
-
-          if (_isArray4) {
-            if (_i4 >= _iterator4.length) break;
-            _ref9 = _iterator4[_i4++];
-          } else {
-            _i4 = _iterator4.next();
-            if (_i4.done) break;
-            _ref9 = _i4.value;
-          }
-
-          var _ref10 = _ref9,
-              name = _ref10[0],
-              value = _ref10[1];
-          h.set(name, value);
-        }
-
+        new Headers(headers).forEach(function (value, name) {
+          return h.set(name, value);
+        });
         headers = h;
       } else {
         headers = new Headers(_this.headers || headers || {});

@@ -16,7 +16,9 @@ function createURLSearchParams(query) {
   const q = new URLSearchParams();
 
   for (const [name, value] of query) {
-    if (value != null) q.append(name, value);
+    if (value != null) {
+      q.append(name, value);
+    }
   }
 
   return q
@@ -30,7 +32,9 @@ function createFormData(data) {
   const f = new FormData();
 
   for (const [name, value, filename] of data) {
-    if (value != null) f.append(name, value, filename);
+    if (value != null) {
+      f.append(name, value, filename);
+    }
   }
 
   return f
@@ -86,16 +90,12 @@ class Teleman {
           query = createURLSearchParams(query);
         }
 
-        for (const [name, value] of query.entries()) {
-          url.searchParams.append(name, value);
-        }
+        query.forEach((value, name) => url.searchParams.append(name, value));
       }
 
       if (this.headers && headers) {
         const h = new Headers(this.headers);
-        for (const [name, value] of new Headers(headers).entries()) {
-          h.set(name, value);
-        }
+        new Headers(headers).forEach((value, name) => h.set(name, value));
         headers = h;
       } else {
         headers = new Headers(this.headers || headers || {});
