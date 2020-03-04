@@ -159,9 +159,7 @@ function createFormData(data) {
   return f;
 }
 
-var Teleman =
-/*#__PURE__*/
-function () {
+var Teleman = /*#__PURE__*/function () {
   function Teleman(_temp) {
     var _ref5 = _temp === void 0 ? {} : _temp,
         base = _ref5.base,
@@ -211,30 +209,34 @@ function () {
     };
 
     return fetch;
-  }(function (url, _temp2) {
+  }(function (url, _ref6) {
     var _this = this;
 
-    var _ref6 = _temp2 === void 0 ? {} : _temp2,
-        _ref6$method = _ref6.method,
-        method = _ref6$method === void 0 ? 'GET' : _ref6$method,
-        _ref6$base = _ref6.base,
-        base = _ref6$base === void 0 ? this.base : _ref6$base,
-        headers = _ref6.headers,
-        query = _ref6.query,
-        _ref6$params = _ref6.params,
-        params = _ref6$params === void 0 ? {} : _ref6$params,
-        body = _ref6.body,
-        _ref6$readBody = _ref6.readBody,
-        readBody = _ref6$readBody === void 0 ? this.readBody : _ref6$readBody,
-        _ref6$throwFailedResp = _ref6.throwFailedResponse,
-        throwFailedResponse = _ref6$throwFailedResp === void 0 ? this.throwFailedResponse : _ref6$throwFailedResp,
-        _ref6$use = _ref6.use,
-        use = _ref6$use === void 0 ? this.middleware : _ref6$use,
-        _ref6$useBefore = _ref6.useBefore,
-        useBefore = _ref6$useBefore === void 0 ? [] : _ref6$useBefore,
-        _ref6$useAfter = _ref6.useAfter,
-        useAfter = _ref6$useAfter === void 0 ? [] : _ref6$useAfter,
-        rest = _objectWithoutPropertiesLoose(_ref6, ["method", "base", "headers", "query", "params", "body", "readBody", "throwFailedResponse", "use", "useBefore", "useAfter"]);
+    if (_ref6 === void 0) {
+      _ref6 = {};
+    }
+
+    var _ref7 = _ref6,
+        _ref7$method = _ref7.method,
+        method = _ref7$method === void 0 ? 'GET' : _ref7$method,
+        _ref7$base = _ref7.base,
+        base = _ref7$base === void 0 ? this.base : _ref7$base,
+        headers = _ref7.headers,
+        query = _ref7.query,
+        _ref7$params = _ref7.params,
+        params = _ref7$params === void 0 ? {} : _ref7$params,
+        body = _ref7.body,
+        _ref7$readBody = _ref7.readBody,
+        readBody = _ref7$readBody === void 0 ? this.readBody : _ref7$readBody,
+        _ref7$throwFailedResp = _ref7.throwFailedResponse,
+        throwFailedResponse = _ref7$throwFailedResp === void 0 ? this.throwFailedResponse : _ref7$throwFailedResp,
+        _ref7$use = _ref7.use,
+        use = _ref7$use === void 0 ? this.middleware : _ref7$use,
+        _ref7$useBefore = _ref7.useBefore,
+        useBefore = _ref7$useBefore === void 0 ? [] : _ref7$useBefore,
+        _ref7$useAfter = _ref7.useAfter,
+        useAfter = _ref7$useAfter === void 0 ? [] : _ref7$useAfter,
+        rest = _objectWithoutPropertiesLoose(_ref7, ["method", "base", "headers", "query", "params", "body", "readBody", "throwFailedResponse", "use", "useBefore", "useAfter"]);
 
     return new Promise(function (resolve) {
       method = method.toUpperCase();
