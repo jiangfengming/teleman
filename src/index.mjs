@@ -126,7 +126,7 @@ class Teleman {
 
           let body = Promise.resolve()
 
-          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
+          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
             const responseType = response.headers.get('Content-Type')
 
             if (responseType) {
@@ -197,6 +197,14 @@ class Teleman {
       ...options
     })
   }
+
+  purge(url, query, options) {
+    return this.fetch(url, {
+      method: 'PURGE',
+      query,
+      ...options
+    })
+  }
 }
 
 const singleton = Teleman.singleton = new Teleman()
@@ -208,5 +216,6 @@ Teleman.put = singleton.put.bind(singleton)
 Teleman.patch = singleton.patch.bind(singleton)
 Teleman.delete = singleton.delete.bind(singleton)
 Teleman.head = singleton.head.bind(singleton)
+Teleman.purge = singleton.purge.bind(singleton)
 
 export default Teleman

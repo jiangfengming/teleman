@@ -124,7 +124,7 @@ teleman.fetch(url, {
 `String`. Base URL. The request URL will be `new URL(url, base)`.
 
 ##### method
-`String`. HTTP methods. 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'. Defaults to 'GET'.
+`String`. HTTP methods. `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `PURGE`. Defaults to 'GET'.
 
 ##### headers
 `Object` | [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers). HTTP headers.
@@ -184,6 +184,7 @@ teleman.put(url, body, options)
 teleman.patch(url, body, options)
 teleman.delete(url, query, options)
 teleman.head(url, query, options)
+teleman.purge(url, query, options)
 ```
 
 ### teleman.use(middleware, beginning = false)
@@ -247,6 +248,7 @@ Teleman.put(url, body, options)
 Teleman.patch(url, body, options)
 Teleman.delete(url, query, options)
 Teleman.head(url, query, options)
+Teleman.purge(url, query, options)
 
 Teleman.use(middleware)
 ```
