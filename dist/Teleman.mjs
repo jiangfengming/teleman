@@ -31,9 +31,47 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-/**
- * Expose compositor.
- */
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+  var it;
+
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      return function () {
+        if (i >= o.length) return {
+          done: true
+        };
+        return {
+          done: false,
+          value: o[i++]
+        };
+      };
+    }
+
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  it = o[Symbol.iterator]();
+  return it.next.bind(it);
+}
 
 var koaCompose = compose;
 /**
@@ -49,19 +87,8 @@ var koaCompose = compose;
 function compose(middleware) {
   if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!');
 
-  for (var _iterator = middleware, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
-
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref = _i.value;
-    }
-
-    var fn = _ref;
+  for (var _iterator = _createForOfIteratorHelperLoose(middleware), _step; !(_step = _iterator()).done;) {
+    var fn = _step.value;
     if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!');
   }
   /**
@@ -103,21 +130,10 @@ function createURLSearchParams(query) {
 
   var q = new URLSearchParams();
 
-  for (var _iterator = query, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
-
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref = _i.value;
-    }
-
-    var _ref2 = _ref,
-        name = _ref2[0],
-        value = _ref2[1];
+  for (var _iterator = _createForOfIteratorHelperLoose(query), _step; !(_step = _iterator()).done;) {
+    var _step$value = _step.value,
+        name = _step$value[0],
+        value = _step$value[1];
 
     if (value != null) {
       q.append(name, value);
@@ -134,22 +150,11 @@ function createFormData(data) {
 
   var f = new FormData();
 
-  for (var _iterator2 = data, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-    var _ref3;
-
-    if (_isArray2) {
-      if (_i2 >= _iterator2.length) break;
-      _ref3 = _iterator2[_i2++];
-    } else {
-      _i2 = _iterator2.next();
-      if (_i2.done) break;
-      _ref3 = _i2.value;
-    }
-
-    var _ref4 = _ref3,
-        name = _ref4[0],
-        value = _ref4[1],
-        filename = _ref4[2];
+  for (var _iterator2 = _createForOfIteratorHelperLoose(data), _step2; !(_step2 = _iterator2()).done;) {
+    var _step2$value = _step2.value,
+        name = _step2$value[0],
+        value = _step2$value[1],
+        filename = _step2$value[2];
 
     if (value != null) {
       f.append(name, value, filename);
@@ -161,13 +166,13 @@ function createFormData(data) {
 
 var Teleman = /*#__PURE__*/function () {
   function Teleman(_temp) {
-    var _ref5 = _temp === void 0 ? {} : _temp,
-        base = _ref5.base,
-        headers = _ref5.headers,
-        _ref5$readBody = _ref5.readBody,
-        readBody = _ref5$readBody === void 0 ? true : _ref5$readBody,
-        _ref5$throwFailedResp = _ref5.throwFailedResponse,
-        throwFailedResponse = _ref5$throwFailedResp === void 0 ? true : _ref5$throwFailedResp;
+    var _ref = _temp === void 0 ? {} : _temp,
+        base = _ref.base,
+        headers = _ref.headers,
+        _ref$readBody = _ref.readBody,
+        readBody = _ref$readBody === void 0 ? true : _ref$readBody,
+        _ref$throwFailedRespo = _ref.throwFailedResponse,
+        throwFailedResponse = _ref$throwFailedRespo === void 0 ? true : _ref$throwFailedRespo;
 
     if (base) {
       this.base = base;
@@ -209,34 +214,30 @@ var Teleman = /*#__PURE__*/function () {
     };
 
     return fetch;
-  }(function (url, _ref6) {
+  }(function (url, _temp2) {
     var _this = this;
 
-    if (_ref6 === void 0) {
-      _ref6 = {};
-    }
-
-    var _ref7 = _ref6,
-        _ref7$method = _ref7.method,
-        method = _ref7$method === void 0 ? 'GET' : _ref7$method,
-        _ref7$base = _ref7.base,
-        base = _ref7$base === void 0 ? this.base : _ref7$base,
-        headers = _ref7.headers,
-        query = _ref7.query,
-        _ref7$params = _ref7.params,
-        params = _ref7$params === void 0 ? {} : _ref7$params,
-        body = _ref7.body,
-        _ref7$readBody = _ref7.readBody,
-        readBody = _ref7$readBody === void 0 ? this.readBody : _ref7$readBody,
-        _ref7$throwFailedResp = _ref7.throwFailedResponse,
-        throwFailedResponse = _ref7$throwFailedResp === void 0 ? this.throwFailedResponse : _ref7$throwFailedResp,
-        _ref7$use = _ref7.use,
-        use = _ref7$use === void 0 ? this.middleware : _ref7$use,
-        _ref7$useBefore = _ref7.useBefore,
-        useBefore = _ref7$useBefore === void 0 ? [] : _ref7$useBefore,
-        _ref7$useAfter = _ref7.useAfter,
-        useAfter = _ref7$useAfter === void 0 ? [] : _ref7$useAfter,
-        rest = _objectWithoutPropertiesLoose(_ref7, ["method", "base", "headers", "query", "params", "body", "readBody", "throwFailedResponse", "use", "useBefore", "useAfter"]);
+    var _ref2 = _temp2 === void 0 ? {} : _temp2,
+        _ref2$method = _ref2.method,
+        method = _ref2$method === void 0 ? 'GET' : _ref2$method,
+        _ref2$base = _ref2.base,
+        base = _ref2$base === void 0 ? this.base : _ref2$base,
+        headers = _ref2.headers,
+        query = _ref2.query,
+        _ref2$params = _ref2.params,
+        params = _ref2$params === void 0 ? {} : _ref2$params,
+        body = _ref2.body,
+        _ref2$readBody = _ref2.readBody,
+        readBody = _ref2$readBody === void 0 ? this.readBody : _ref2$readBody,
+        _ref2$throwFailedResp = _ref2.throwFailedResponse,
+        throwFailedResponse = _ref2$throwFailedResp === void 0 ? this.throwFailedResponse : _ref2$throwFailedResp,
+        _ref2$use = _ref2.use,
+        use = _ref2$use === void 0 ? this.middleware : _ref2$use,
+        _ref2$useBefore = _ref2.useBefore,
+        useBefore = _ref2$useBefore === void 0 ? [] : _ref2$useBefore,
+        _ref2$useAfter = _ref2.useAfter,
+        useAfter = _ref2$useAfter === void 0 ? [] : _ref2$useAfter,
+        rest = _objectWithoutPropertiesLoose(_ref2, ["method", "base", "headers", "query", "params", "body", "readBody", "throwFailedResponse", "use", "useBefore", "useAfter"]);
 
     return new Promise(function (resolve) {
       method = method.toUpperCase();
@@ -295,7 +296,7 @@ var Teleman = /*#__PURE__*/function () {
           ctx.response = response;
           var body = Promise.resolve();
 
-          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
+          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
             var responseType = response.headers.get('Content-Type');
 
             if (responseType) {
@@ -363,6 +364,13 @@ var Teleman = /*#__PURE__*/function () {
     }, options));
   };
 
+  _proto.purge = function purge(url, query, options) {
+    return this.fetch(url, _extends({
+      method: 'PURGE',
+      query: query
+    }, options));
+  };
+
   return Teleman;
 }();
 
@@ -375,6 +383,7 @@ Teleman.put = singleton.put.bind(singleton);
 Teleman.patch = singleton.patch.bind(singleton);
 Teleman["delete"] = singleton["delete"].bind(singleton);
 Teleman.head = singleton.head.bind(singleton);
+Teleman.purge = singleton.purge.bind(singleton);
 
 export default Teleman;
 //# sourceMappingURL=Teleman.mjs.map

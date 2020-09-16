@@ -8,7 +8,8 @@ export default {
     format: 'cjs',
     name: 'Teleman',
     file: 'dist/Teleman.js',
-    sourcemap: true
+    sourcemap: true,
+    exports: 'auto'
   },
 
   plugins: [

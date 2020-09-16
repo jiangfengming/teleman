@@ -1,8 +1,10 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+var compose = require('koa-compose');
 
-var compose = _interopDefault(require('koa-compose'));
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var compose__default = /*#__PURE__*/_interopDefaultLegacy(compose);
 
 function createURLSearchParams(query) {
   if (query.constructor === String) {
@@ -124,13 +126,13 @@ class Teleman {
         ...rest
       };
 
-      resolve(compose([...useBefore, ...use, ...useAfter])(ctx, () =>
+      resolve(compose__default['default']([...useBefore, ...use, ...useAfter])(ctx, () =>
         fetch(ctx.url.href, ctx.options).then(response => {
           ctx.response = response;
 
           let body = Promise.resolve();
 
-          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(ctx.options.method.toUpperCase())) {
+          if (readBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
             const responseType = response.headers.get('Content-Type');
 
             if (responseType) {
@@ -201,6 +203,14 @@ class Teleman {
       ...options
     })
   }
+
+  purge(url, query, options) {
+    return this.fetch(url, {
+      method: 'PURGE',
+      query,
+      ...options
+    })
+  }
 }
 
 const singleton = Teleman.singleton = new Teleman();
@@ -212,6 +222,7 @@ Teleman.put = singleton.put.bind(singleton);
 Teleman.patch = singleton.patch.bind(singleton);
 Teleman.delete = singleton.delete.bind(singleton);
 Teleman.head = singleton.head.bind(singleton);
+Teleman.purge = singleton.purge.bind(singleton);
 
 module.exports = Teleman;
 //# sourceMappingURL=Teleman.js.map
