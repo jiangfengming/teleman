@@ -25,19 +25,34 @@ npm i teleman
 ```js
 import Teleman from 'teleman'
 
-const api = new Teleman({
-  base: 'http://api.example.com'
-})
+async function main() {
+  const api = new Teleman({
+    base: 'http://api.example.com'
+  });
 
-async function() {
-  const article = await api.get('/articles', { id: 123 })
+  const article = await api.get('/articles', { id: 123 });
 
   // post JSON
-  await api.post('/articles', { title: 'Hello', content: '# Hello' })
+  await api.post('/articles', { title: 'Hello', content: '# Hello' });
 
   // post with Content-Type: multipart/form-data
-  await api.post('/upload', new FormData(document.forms[0]))
+  await api.post('/upload', new FormData(document.forms[0]));
 }
+```
+
+### Singleton
+You can also use Teleman directly without creating an instance.
+```js
+import { teleman } from 'teleman';
+
+teleman.get(url, query, options);
+teleman.post(url, body, options);
+teleman.put(url, body, options);
+teleman.patch(url, body, options);
+teleman.delete(url, query, options);
+teleman.head(url, query, options);
+teleman.purge(url, query, options);
+teleman.use(middleware);
 ```
 
 ### Node.js
@@ -48,20 +63,19 @@ In Node.js, you need to include some polyfills ([node-fetch](https://github.com/
 npm i teleman teleman-node
 ```
 
-Then, import Teleman via
 ```js
-const Teleman = require('teleman-node')
-```
+require('teleman-node');
 
-Or
-```js
-require('teleman-node')
-const Teleman = require('teleman')
+// class
+const { Teleman } = require('teleman');
+
+// singleton instance
+const { teleman } = require('teleman');
 ```
 
 ## Constructor
 ```js
-new Teleman({ base, headers, readBody = true, throwFailedResponse = true})
+new Teleman({ base, headers, parseResponseBody = true, throwFailedResponse = true})
 ```
 
 Creates a Teleman instance.
@@ -73,7 +87,7 @@ Creates a Teleman instance.
 `Object`. Optional. Default headers. It can be a simple key-value object or
 [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers) object.
 
-### readBody
+### parseResponseBody
 `Boolean`. Optional. Defaults to `true`. Whether to auto read the response body.
 According to `content-type` header of the response, it will use different methods:
 * `application/json`: `response.json()`
@@ -81,9 +95,9 @@ According to `content-type` header of the response, it will use different method
 * `multipart/form-data`: `response.formData()`
 * Others: Won't read, manully handle the response in the middleware.
 
-If you turn off `readBody`, you need to handle response body in the middleware.
+If you turn off `parseResponseBody`, you need to handle response body in the middleware.
 ```js
-const api = new Teleman({ readBody: false })
+const api = new Teleman({ parseResponseBody: false })
 
 api.use(async(ctx, next) => {
   await next()
@@ -106,7 +120,7 @@ teleman.fetch(url, {
   query,
   params = {},
   body,
-  readBody = this.readBody,
+  parseResponseBody = this.parseResponseBody,
   throwFailedResponse = this.throwFailedResponse,
   use = this.middleware,
   useBefore = [],
@@ -138,7 +152,7 @@ The query string appends to the URL. It takes the same format as
 ##### params
 `Object`. URL path params.
 ```js
-Teleman.fetch('/articles/:id', { params: { id: 1 } })
+teleman.fetch('/articles/:id', { params: { id: 1 } })
 ```
 It will use `encodeURIComponent()` to encode the values.
 
@@ -150,7 +164,7 @@ If the body is a plain object, it will be converted to other type according to `
 * `multipart/form-data`: to FormData.
 * `application/x-www-form-urlencoded`: to URLSearchParams.
 
-##### readBody
+##### parseResponseBody
 `Boolean`. Whether to read response body.  
 
 ##### throwFailedResponse
@@ -172,7 +186,7 @@ Other params will be set into the context object.
 `teleman.fetch()` returns a promise.
 * If `response.ok` is `true`, the promise will be resolved with the response body, otherwise it will be rejected with
 the response body.
-* If `readBody` is set to `false`, or `content-type` can't be handled, the promise will be resolved or rejected with
+* If `parseResponseBody` is set to `false`, or `content-type` can't be handled, the promise will be resolved or rejected with
 no value, depending on `response.ok`. In this case, you should handle the response your self in the middleware.
 * If any error occurs, the promise will be rejected with the error.
 
@@ -222,7 +236,7 @@ api.use(async(ctx, next) => {
   url, // URL object
   options: { method, headers, body },
   response, // available after `await next()`
-  readBody,
+  parseResponseBody,
   ...rest
 }
 ```
@@ -236,24 +250,6 @@ You can modify the context properties to interfere the request and response.
 #### next
 A middleware function should receive response body from `next()`, and can optionally transform the data.
 Finally it should return the data.
-
-## Static methods
-You can also use Teleman directly without creating an instance.
-```js
-import Teleman from 'teleman'
-
-Teleman.get(url, query, options)
-Teleman.post(url, body, options)
-Teleman.put(url, body, options)
-Teleman.patch(url, body, options)
-Teleman.delete(url, query, options)
-Teleman.head(url, query, options)
-Teleman.purge(url, query, options)
-
-Teleman.use(middleware)
-```
-
-`Teleman.singleton` is the default singleton instance.
 
 ## License
 

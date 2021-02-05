@@ -2,13 +2,20 @@
   "name": "teleman",
   "version": "0.5.6",
   "description": "A browser and node.js fetch API wrapper.",
-  "main": "dist/Teleman",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
-    "test-server": "node test/test-server",
-    "test-it": "nyc --reporter=lcov mocha test/Teleman.spec.js",
+    "test-server": "node test/test-server.cjs",
+    "test-it": "nyc --reporter=lcov mocha test/teleman.spec.cjs",
     "test": "start-server-and-test test-server 3000 test-it",
     "codecov": "codecov",
-    "build": "rollup -c rollup.config.esm.js && rollup -c rollup.config.cjs.js"
+    "build": "rollup -c rollup.config.esm.js && rollup -c rollup.config.cjs.js && tsc -d --emitDeclarationOnly --declarationDir dist"
   },
   "repository": {
     "type": "git",
@@ -32,33 +39,28 @@
     "koa-compose": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/preset-env": "^7.11.5",
     "@koa/cors": "^3.1.0",
-    "@rollup/plugin-commonjs": "^15.0.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
-    "babel-eslint": "^10.1.0",
-    "chai": "^4.2.0",
-    "codecov": "^3.7.2",
-    "eslint": "^7.9.0",
-    "eslint-config-enough": "^0.5.0",
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.1.1",
+    "@rollup/plugin-typescript": "^8.1.1",
+    "@types/koa-compose": "^3.2.5",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "chai": "^4.3.0",
+    "codecov": "^3.8.1",
+    "eslint": "^7.19.0",
+    "eslint-config-enough": "^0.7.0",
+    "eslint-plugin-ext": "^0.1.0",
     "form-data": "^3.0.0",
-    "koa": "^2.13.0",
+    "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
-    "koa-router": "^9.4.0",
-    "mocha": "^8.1.3",
+    "koa-router": "^10.0.0",
+    "mocha": "^8.2.1",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
-    "rollup": "^2.27.0",
-    "rollup-plugin-babel": "^4.3.3",
-    "start-server-and-test": "^1.11.3"
-  },
-  "eslintConfig": {
-    "extends": "enough",
-    "env": {
-      "node": true,
-      "browser": true,
-      "mocha": true
-    }
+    "rollup": "^2.38.5",
+    "start-server-and-test": "^1.12.0",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.3"
   }
 }
