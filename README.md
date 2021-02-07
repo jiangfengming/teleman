@@ -1,10 +1,10 @@
 # Teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/kasha-io/teleman.svg)](https://circleci.com/gh/kasha-io/teleman)
-[![Codecov](https://img.shields.io/codecov/c/github/kasha-io/teleman.svg)](https://codecov.io/gh/kasha-io/teleman)
+[![CircleCI](https://img.shields.io/circleci/project/github/jiangfengming/teleman.svg)](https://circleci.com/gh/jiangfengming/teleman)
+[![Codecov](https://img.shields.io/codecov/c/github/jiangfengming/teleman.svg)](https://codecov.io/gh/jiangfengming/teleman)
 [![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
 [![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
-[![license](https://img.shields.io/github/license/kasha-io/teleman.svg)](https://github.com/kasha-io/teleman)
+[![license](https://img.shields.io/github/license/jiangfengming/teleman.svg)](https://github.com/jiangfengming/teleman)
 
 A tiny (~2kb after gzipped) `fetch` API wrapper.
 
@@ -19,6 +19,9 @@ A tiny (~2kb after gzipped) `fetch` API wrapper.
 ```sh
 npm i teleman
 ```
+
+NOTE: The code is written in ES2020 syntax and not transpiled.
+To use it in old browsers, you should transpile the code using tools such as Babel.
 
 ## Usage
 
@@ -58,19 +61,25 @@ teleman.use(middleware);
 ### Node.js
 In Node.js, you need to include some polyfills ([node-fetch](https://github.com/bitinn/node-fetch) and
 [form-data](https://github.com/form-data/form-data)).
-[teleman-node](https://github.com/kasha-io/teleman-node) has included all the polyfills for you.
-```
+[teleman-node](https://github.com/jiangfengming/teleman-node) has included all the polyfills for you.
+
+```sh
 npm i teleman teleman-node
 ```
 
 ```js
-require('teleman-node');
-
 // class
-const { Teleman } = require('teleman');
+const { Teleman } = require('teleman-node');
 
 // singleton instance
-const { teleman } = require('teleman');
+const { teleman } = require('teleman-node');
+```
+
+Or
+
+```js
+require('teleman-node');
+const { Teleman, teleman } = require('teleman');
 ```
 
 ## Constructor
