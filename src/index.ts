@@ -222,7 +222,7 @@ class Teleman {
     });
   }
 
-  get(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  get(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'GET',
@@ -230,7 +230,7 @@ class Teleman {
     });
   }
 
-  post(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  post(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'POST',
@@ -238,7 +238,7 @@ class Teleman {
     });
   }
 
-  put(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  put(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'PUT',
@@ -246,7 +246,7 @@ class Teleman {
     });
   }
 
-  patch(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  patch(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'PATCH',
@@ -254,7 +254,7 @@ class Teleman {
     });
   }
 
-  delete(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  delete(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'DELETE',
@@ -262,7 +262,7 @@ class Teleman {
     });
   }
 
-  head(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  head(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'HEAD',
@@ -270,7 +270,7 @@ class Teleman {
     });
   }
 
-  purge(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  purge(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
     return this.fetch(path, {
       ...options,
       method: 'PURGE',
