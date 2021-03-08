@@ -46,13 +46,13 @@ declare class Teleman {
     });
     use(middleware: Middleware, beginning?: boolean): void;
     fetch(path: string, { method, base, headers, query, params, body, parseResponseBody, throwFailedResponse, use, useBefore, useAfter, ...rest }?: ReqOptions): Promise<unknown>;
-    get(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    post(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    put(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    patch(path: string, body: ReqBody, options: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    delete(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    head(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    purge(path: string, query: Query, options: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
+    get(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
+    post(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
+    put(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
+    patch(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
+    delete(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
+    head(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
+    purge(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
 }
 export default Teleman;
 export { Teleman };
