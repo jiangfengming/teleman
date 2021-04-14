@@ -2,7 +2,7 @@ declare type PrimitiveType = string | number | boolean | null | undefined;
 declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] | {
     [name: string]: SerializableData;
 };
-declare type ReqOptions = {
+export declare type ReqOptions = {
     method?: Method | MethodLowercase;
     base?: string;
     headers?: Headers | Record<string, string>;
@@ -14,12 +14,12 @@ declare type ReqOptions = {
     use?: Middleware[];
     useBefore?: Middleware[];
     useAfter?: Middleware[];
-    [name: string]: unknown;
+    [index: string]: any;
 };
 declare type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
 declare type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
 declare type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
-declare type MiddlewareCtx = {
+export declare type MiddlewareCtx = {
     url: URL;
     options: {
         method: Method;
@@ -28,9 +28,9 @@ declare type MiddlewareCtx = {
     };
     parseResponseBody: boolean;
     response?: Response;
-    [name: string]: unknown;
+    [name: string]: any;
 };
-declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<unknown>) => Promise<unknown>;
+declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
 declare type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
 declare class Teleman {
     base?: string;
@@ -45,14 +45,14 @@ declare class Teleman {
         throwFailedResponse?: boolean;
     });
     use(middleware: Middleware, beginning?: boolean): void;
-    fetch(path: string, { method, base, headers, query, params, body, parseResponseBody, throwFailedResponse, use, useBefore, useAfter, ...rest }?: ReqOptions): Promise<unknown>;
-    get(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    post(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    put(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    patch(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown>;
-    delete(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    head(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
-    purge(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown>;
+    fetch(path: string, { method, base, headers, query, params, body, parseResponseBody, throwFailedResponse, use, useBefore, useAfter, ...rest }?: ReqOptions): Promise<any>;
+    get(path: string, query?: Query, options?: ReqOptions): Promise<any>;
+    post(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
+    put(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
+    patch(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
+    delete(path: string, query?: Query, options?: ReqOptions): Promise<any>;
+    head(path: string, query?: Query, options?: ReqOptions): Promise<any>;
+    purge(path: string, query?: Query, options?: ReqOptions): Promise<any>;
 }
 export default Teleman;
 export { Teleman };

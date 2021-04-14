@@ -119,7 +119,7 @@ class Teleman {
             }
             if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
                 const contentType = headers.get('Content-Type') || '';
-                if ((!contentType && body && body.constructor === Object) || contentType.startsWith('application/json')) {
+                if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
                     if (!headers.has('Content-Type')) {
                         headers.set('Content-Type', 'application/json');
                     }

@@ -5,7 +5,7 @@ type PrimitiveType = string | number | boolean | null | undefined;
 declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] |
     { [name: string]: SerializableData };
 
-type ReqOptions = {
+export type ReqOptions = {
   method?: Method | MethodLowercase,
   base?: string,
   headers?: Headers | Record<string, string>,
@@ -17,7 +17,7 @@ type ReqOptions = {
   use?: Middleware[],
   useBefore?: Middleware[],
   useAfter?: Middleware[],
-  [name: string]: unknown
+  [index: string]: any
 };
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
@@ -25,7 +25,7 @@ type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'p
 
 type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 
-type MiddlewareCtx = {
+export type MiddlewareCtx = {
   url: URL,
 
   options: {
@@ -36,10 +36,10 @@ type MiddlewareCtx = {
 
   parseResponseBody: boolean,
   response?: Response,
-  [name: string]: unknown
+  [name: string]: any
 };
 
-type Middleware = (ctx: MiddlewareCtx, next: () => Promise<unknown>) => Promise<unknown>;
+type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
 
 type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
 
@@ -140,7 +140,7 @@ class Teleman {
     useBefore = [],
     useAfter = [],
     ...rest
-  }: ReqOptions = {}): Promise<unknown> {
+  }: ReqOptions = {}): Promise<any> {
     return new Promise(resolve => {
       method = method.toUpperCase() as Method;
       const url = new URL(path.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base);
@@ -164,7 +164,7 @@ class Teleman {
       if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
         const contentType = headers.get('Content-Type') || '';
 
-        if ((!contentType && body && body.constructor === Object) || contentType.startsWith('application/json')) {
+        if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
           if (!headers.has('Content-Type')) {
             headers.set('Content-Type', 'application/json');
           }
@@ -194,7 +194,7 @@ class Teleman {
         fetch(ctx.url.href, ctx.options).then(response => {
           ctx.response = response;
 
-          let body: Promise<unknown> = Promise.resolve();
+          let body: Promise<any> = Promise.resolve();
 
           if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
             const responseType = response.headers.get('Content-Type');
@@ -222,7 +222,7 @@ class Teleman {
     });
   }
 
-  get(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  get(path: string, query?: Query, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'GET',
@@ -230,7 +230,7 @@ class Teleman {
     });
   }
 
-  post(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  post(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'POST',
@@ -238,7 +238,7 @@ class Teleman {
     });
   }
 
-  put(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  put(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'PUT',
@@ -246,7 +246,7 @@ class Teleman {
     });
   }
 
-  patch(path: string, body?: ReqBody, options?: Omit<ReqOptions, 'method' | 'body'>): Promise<unknown> {
+  patch(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'PATCH',
@@ -254,7 +254,7 @@ class Teleman {
     });
   }
 
-  delete(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  delete(path: string, query?: Query, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'DELETE',
@@ -262,7 +262,7 @@ class Teleman {
     });
   }
 
-  head(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  head(path: string, query?: Query, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'HEAD',
@@ -270,7 +270,7 @@ class Teleman {
     });
   }
 
-  purge(path: string, query?: Query, options?: Omit<ReqOptions, 'method' | 'query'>): Promise<unknown> {
+  purge(path: string, query?: Query, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'PURGE',
