@@ -1,5 +1,5 @@
-declare type PrimitiveType = string | number | boolean | null | undefined;
-declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] | {
+export declare type PrimitiveType = string | number | boolean | null | undefined;
+export declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] | {
     [name: string]: SerializableData;
 };
 export declare type ReqOptions = {
@@ -16,9 +16,9 @@ export declare type ReqOptions = {
     useAfter?: Middleware[];
     [index: string]: any;
 };
-declare type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
-declare type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
-declare type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
+export declare type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
+export declare type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
+export declare type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 export declare type MiddlewareCtx = {
     url: URL;
     options: {
@@ -30,8 +30,9 @@ export declare type MiddlewareCtx = {
     response?: Response;
     [name: string]: any;
 };
-declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
-declare type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+export declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
+export declare type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+export declare type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 declare class Teleman {
     base?: string;
     headers?: Headers | Record<string, string>;

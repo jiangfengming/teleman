@@ -1,8 +1,8 @@
 import compose from 'koa-compose';
 
-type PrimitiveType = string | number | boolean | null | undefined;
+export type PrimitiveType = string | number | boolean | null | undefined;
 
-declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] |
+export type SerializableData = string | number | boolean | null | undefined | SerializableData[] |
     { [name: string]: SerializableData };
 
 export type ReqOptions = {
@@ -20,10 +20,10 @@ export type ReqOptions = {
   [index: string]: any
 };
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
-type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
+export type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
 
-type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
+export type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 
 export type MiddlewareCtx = {
   url: URL,
@@ -39,9 +39,11 @@ export type MiddlewareCtx = {
   [name: string]: any
 };
 
-type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
+export type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
 
-type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+export type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+
+export type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 
 function createURLSearchParams(query: Query) {
   if (query.constructor === String) {
@@ -62,8 +64,6 @@ function createURLSearchParams(query: Query) {
 
   return q;
 }
-
-type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 
 function createFormData(data: FormBody) {
   if (data.constructor === Object) {
