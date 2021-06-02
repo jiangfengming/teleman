@@ -230,7 +230,7 @@ class Teleman {
     });
   }
 
-  post(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
+  post(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'POST',
@@ -238,7 +238,7 @@ class Teleman {
     });
   }
 
-  put(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
+  put(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'PUT',
@@ -246,7 +246,7 @@ class Teleman {
     });
   }
 
-  patch(path: string, body?: ReqBody, options?: ReqOptions): Promise<any> {
+  patch(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
     return this.fetch(path, {
       ...options,
       method: 'PATCH',
