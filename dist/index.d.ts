@@ -48,9 +48,9 @@ declare class Teleman {
     use(middleware: Middleware, beginning?: boolean): void;
     fetch(path: string, { method, base, headers, query, params, body, parseResponseBody, throwFailedResponse, use, useBefore, useAfter, ...rest }?: ReqOptions): Promise<any>;
     get(path: string, query?: Query, options?: ReqOptions): Promise<any>;
-    post(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
-    put(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
-    patch(path: string, body?: ReqBody, options?: ReqOptions): Promise<any>;
+    post(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any>;
+    put(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any>;
+    patch(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any>;
     delete(path: string, query?: Query, options?: ReqOptions): Promise<any>;
     head(path: string, query?: Query, options?: ReqOptions): Promise<any>;
     purge(path: string, query?: Query, options?: ReqOptions): Promise<any>;
