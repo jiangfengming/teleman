@@ -5,14 +5,6 @@
 if (typeof window !== 'undefined') {
   test(window);
 } else {
-  const { URL, URLSearchParams } = require('url');
-  global.URL = URL;
-  global.URLSearchParams = URLSearchParams;
-  global.FormData = require('form-data');
-  global.fetch = require('node-fetch');
-  global.Headers = fetch.Headers;
-
-  const Response = fetch.Response;
   const { assert } = require('chai');
   const { Teleman } = require('../dist/index.cjs');
 

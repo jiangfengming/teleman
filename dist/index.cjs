@@ -30,7 +30,12 @@ function createFormData(data) {
     const f = new FormData();
     for (const [name, value, filename] of data) {
         if (value !== null && value !== undefined) {
-            f.append(name, value, filename);
+            if (filename) {
+                f.append(name, value, filename);
+            }
+            else {
+                f.append(name, value);
+            }
         }
     }
     return f;
@@ -105,7 +110,7 @@ class Teleman {
                 parseResponseBody,
                 ...rest
             };
-            resolve(compose__default['default']([...useBefore, ...use, ...useAfter])(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
+            resolve(compose__default["default"]([...useBefore, ...use, ...useAfter])(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
                 ctx.response = response;
                 let body = Promise.resolve();
                 if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
@@ -186,6 +191,6 @@ class Teleman {
 const teleman = new Teleman();
 
 exports.Teleman = Teleman;
-exports.default = Teleman;
+exports["default"] = Teleman;
 exports.teleman = teleman;
 //# sourceMappingURL=index.cjs.map

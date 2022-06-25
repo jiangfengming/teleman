@@ -74,7 +74,11 @@ function createFormData(data: FormBody) {
 
   for (const [name, value, filename] of data as [string, PrimitiveType | Blob, string?][]) {
     if (value !== null && value !== undefined) {
-      f.append(name, value as string, filename);
+      if (filename) {
+        f.append(name, value as Blob, filename);
+      } else {
+        f.append(name, value as string);
+      }
     }
   }
 

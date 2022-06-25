@@ -59,28 +59,7 @@ teleman.use(middleware);
 ```
 
 ### Node.js
-In Node.js, you need to include some polyfills ([node-fetch](https://github.com/bitinn/node-fetch) and
-[form-data](https://github.com/form-data/form-data)).
-[teleman-node](https://github.com/jiangfengming/teleman-node) has included all the polyfills for you.
-
-```sh
-npm i teleman teleman-node
-```
-
-```js
-// class
-const { Teleman } = require('teleman-node');
-
-// singleton instance
-const { teleman } = require('teleman-node');
-```
-
-Or
-
-```js
-require('teleman-node');
-const { Teleman, teleman } = require('teleman');
-```
+Node.js v18+ included native fetch.
 
 ## Constructor
 ```js

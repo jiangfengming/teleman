@@ -67,7 +67,12 @@ function createFormData(data) {
     const f = new FormData();
     for (const [name, value, filename] of data) {
         if (value !== null && value !== undefined) {
-            f.append(name, value, filename);
+            if (filename) {
+                f.append(name, value, filename);
+            }
+            else {
+                f.append(name, value);
+            }
         }
     }
     return f;
@@ -222,6 +227,5 @@ class Teleman {
 }
 const teleman = new Teleman();
 
-export default Teleman;
-export { Teleman, teleman };
+export { Teleman, Teleman as default, teleman };
 //# sourceMappingURL=index.js.map
