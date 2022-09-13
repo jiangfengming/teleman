@@ -1,0 +1,24 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+
+  "plugins": [
+    "@typescript-eslint"
+  ],
+
+  "extends": [
+    "unambiguous",
+    "plugin:@typescript-eslint/recommended"
+  ],
+
+  "env": {
+    "browser": true,
+    "node": true
+  },
+
+  "rules": {
+    "no-extra-parens": "off",
+    "@typescript-eslint/no-extra-parens": "error",
+    "@typescript-eslint/member-delimiter-style": "error"
+  }
+}

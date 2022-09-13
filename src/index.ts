@@ -6,18 +6,16 @@ export type SerializableData = string | number | boolean | null | undefined | Se
     { [name: string]: SerializableData };
 
 export type ReqOptions = {
-  method?: Method | MethodLowercase,
-  base?: string,
-  headers?: Headers | Record<string, string>,
-  query?: URLSearchParams | string | Record<string, PrimitiveType> | [string, PrimitiveType][],
-  params?: Record<string, string | number | boolean>,
-  body?: ReqBody | SerializableData,
-  parseResponseBody?: boolean,
-  throwFailedResponse?: boolean,
-  use?: Middleware[],
-  useBefore?: Middleware[],
-  useAfter?: Middleware[],
-  [index: string]: any
+  method?: Method | MethodLowercase;
+  base?: string;
+  headers?: Headers | Record<string, string>;
+  query?: URLSearchParams | string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+  params?: Record<string, string | number | boolean>;
+  body?: ReqBody | SerializableData;
+  parseResponseBody?: boolean;
+  throwFailedResponse?: boolean;
+  use?: Middleware[];
+  [index: string]: unknown;
 };
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
@@ -26,20 +24,20 @@ export type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'hea
 export type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 
 export type MiddlewareCtx = {
-  url: URL,
+  url: URL;
 
   options: {
-    method: Method,
-    headers: Headers,
-    body: ReqBody
-  },
+    method: Method;
+    headers: Headers;
+    body: ReqBody;
+  };
 
-  parseResponseBody: boolean,
-  response?: Response,
-  [name: string]: any
+  parseResponseBody: boolean;
+  response?: Response;
+  [name: string]: unknown;
 };
 
-export type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => Promise<any>;
+export type Middleware = (ctx: MiddlewareCtx, next: () => unknown) => unknown;
 
 export type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
 
@@ -86,15 +84,11 @@ function createFormData(data: FormBody) {
 }
 
 class Teleman {
-  base?: string
-
-  headers?: Headers | Record<string, string>
-
-  parseResponseBody: boolean
-
-  throwFailedResponse: boolean
-
-  middleware: Middleware[] = []
+  base?: string;
+  headers: Headers;
+  parseResponseBody: boolean;
+  throwFailedResponse: boolean;
+  middleware: Middleware[] = [];
 
   constructor({
     base,
@@ -102,10 +96,10 @@ class Teleman {
     parseResponseBody = true,
     throwFailedResponse = true
   }: {
-    base?: string,
-    headers?: Headers | Record<string, string>,
-    parseResponseBody?: boolean,
-    throwFailedResponse?: boolean
+    base?: string;
+    headers?: Headers | Record<string, string>;
+    parseResponseBody?: boolean;
+    throwFailedResponse?: boolean;
   } = {}) {
     if (base) {
       this.base = base;
@@ -118,20 +112,16 @@ class Teleman {
       }
     }
 
-    this.headers = headers;
+    this.headers = new Headers(headers);
     this.parseResponseBody = parseResponseBody;
     this.throwFailedResponse = throwFailedResponse;
   }
 
-  use(middleware: Middleware, beginning = false): void {
-    if (beginning) {
-      this.middleware.unshift(middleware);
-    } else {
-      this.middleware.push(middleware);
-    }
+  use(middleware: Middleware) {
+    this.middleware.push(middleware);
   }
 
-  fetch(path: string, {
+  async fetch<T>(path: string, {
     method = 'GET',
     base = this.base,
     headers,
@@ -141,141 +131,136 @@ class Teleman {
     parseResponseBody = this.parseResponseBody,
     throwFailedResponse = this.throwFailedResponse,
     use = this.middleware,
-    useBefore = [],
-    useAfter = [],
     ...rest
-  }: ReqOptions = {}): Promise<any> {
-    return new Promise(resolve => {
-      method = method.toUpperCase() as Method;
-      const url = new URL(path.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base);
+  }: ReqOptions = {}): Promise<T> {
+    method = method.toUpperCase() as Method;
+    const url = new URL(path.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base);
 
-      if (query) {
-        if (!(query instanceof URLSearchParams)) {
-          query = createURLSearchParams(query);
+    if (query) {
+      if (!(query instanceof URLSearchParams)) {
+        query = createURLSearchParams(query);
+      }
+
+      query.forEach((value, name) => url.searchParams.append(name, value));
+    }
+
+    if (this.headers && headers) {
+      const h = new Headers(this.headers);
+      new Headers(headers).forEach((value, name) => h.set(name, value));
+      headers = h;
+    } else {
+      headers = new Headers(this.headers || headers);
+    }
+
+    if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
+      const contentType = headers.get('Content-Type') || '';
+
+      if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
+        if (!headers.has('Content-Type')) {
+          headers.set('Content-Type', 'application/json');
         }
 
-        query.forEach((value, name) => url.searchParams.append(name, value));
+        body = JSON.stringify(body);
+      } else if (contentType.startsWith('multipart/form-data') && body && !(body instanceof FormData)) {
+        body = createFormData(body as FormBody);
+      } else if (contentType.startsWith('application/x-www-form-urlencoded') && body && !(body instanceof URLSearchParams)) {
+        body = createURLSearchParams(body as Query);
       }
+    }
 
-      if (this.headers && headers) {
-        const h = new Headers(this.headers);
-        new Headers(headers).forEach((value, name) => h.set(name, value));
-        headers = h;
-      } else {
-        headers = new Headers(this.headers || headers || {});
-      }
+    const ctx: MiddlewareCtx = {
+      url,
 
-      if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
-        const contentType = headers.get('Content-Type') || '';
+      options: {
+        method,
+        headers,
+        body: body as ReqBody
+      },
 
-        if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
-          if (!headers.has('Content-Type')) {
-            headers.set('Content-Type', 'application/json');
-          }
+      parseResponseBody,
+      ...rest
+    };
 
-          body = JSON.stringify(body);
-        } else if (contentType.startsWith('multipart/form-data') && body && !(body instanceof FormData)) {
-          body = createFormData(body as FormBody);
-        } else if (contentType.startsWith('application/x-www-form-urlencoded') && body && !(body instanceof URLSearchParams)) {
-          body = createURLSearchParams(body as Query);
-        }
-      }
+    return <Promise<T>>compose(use)(ctx, () =>
+      fetch(ctx.url.href, ctx.options).then(response => {
+        ctx.response = response;
+        let body: Promise<unknown> = Promise.resolve(response);
 
-      const ctx: MiddlewareCtx = {
-        url,
+        if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
+          const responseType = response.headers.get('Content-Type');
 
-        options: {
-          method,
-          headers,
-          body: body as ReqBody
-        },
-
-        parseResponseBody,
-        ...rest
-      };
-
-      resolve(compose([...useBefore, ...use, ...useAfter])(ctx, () =>
-        fetch(ctx.url.href, ctx.options).then(response => {
-          ctx.response = response;
-
-          let body: Promise<any> = Promise.resolve();
-
-          if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
-            const responseType = response.headers.get('Content-Type');
-
-            if (responseType) {
-              if (responseType.startsWith('application/json')) {
-                body = response.json();
-              } else if (responseType.startsWith('text/')) {
-                body = response.text();
-              } else if (responseType.startsWith('multipart/form-data')) {
-                body = response.formData();
-              }
+          if (responseType) {
+            if (responseType.startsWith('application/json')) {
+              body = response.json();
+            } else if (responseType.startsWith('text/')) {
+              body = response.text();
+            } else if (responseType.startsWith('multipart/form-data')) {
+              body = response.formData();
             }
           }
+        }
 
-          if (response.ok || !throwFailedResponse) {
-            return body;
-          } else {
-            return body.then(e => {
-              throw e;
-            });
-          }
-        })
-      ));
-    });
+        if (response.ok || !throwFailedResponse) {
+          return body;
+        } else {
+          return body.then(e => {
+            throw e;
+          });
+        }
+      })
+    );
   }
 
-  get(path: string, query?: Query, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  get<T>(path: string, query?: Query, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'GET',
       query
     });
   }
 
-  post(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  post<T>(path: string, body?: ReqBody | SerializableData, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'POST',
       body
     });
   }
 
-  put(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  put<T>(path: string, body?: ReqBody | SerializableData, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'PUT',
       body
     });
   }
 
-  patch(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  patch<T>(path: string, body?: ReqBody | SerializableData, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'PATCH',
       body
     });
   }
 
-  delete(path: string, query?: Query, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  delete<T>(path: string, query?: Query, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'DELETE',
       query
     });
   }
 
-  head(path: string, query?: Query, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  head<T>(path: string, query?: Query, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'HEAD',
       query
     });
   }
 
-  purge(path: string, query?: Query, options?: ReqOptions): Promise<any> {
-    return this.fetch(path, {
+  purge<T>(path: string, query?: Query, options?: ReqOptions) {
+    return this.fetch<T>(path, {
       ...options,
       method: 'PURGE',
       query

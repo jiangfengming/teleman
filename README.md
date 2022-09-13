@@ -1,18 +1,12 @@
 # Teleman
 
-[![CircleCI](https://img.shields.io/circleci/project/github/jiangfengming/teleman.svg)](https://circleci.com/gh/jiangfengming/teleman)
-[![Codecov](https://img.shields.io/codecov/c/github/jiangfengming/teleman.svg)](https://codecov.io/gh/jiangfengming/teleman)
-[![npm](https://img.shields.io/npm/dm/teleman.svg)](https://www.npmjs.com/package/teleman)
-[![npm](https://img.shields.io/npm/v/teleman.svg)](https://www.npmjs.com/package/teleman)
-[![license](https://img.shields.io/github/license/jiangfengming/teleman.svg)](https://github.com/jiangfengming/teleman)
-
 A tiny (~2kb after gzipped) `fetch` API wrapper.
 
 ## Features
 * Tiny, only about 2kb after gzipped.
-* Supports middleware.
-* Returns decoded response body by default.
-* Handles `response.ok` for you.
+* Support middleware.
+* Return decoded response body by default.
+* Handle `response.ok` for you.
 
 ## Installation
 
@@ -58,9 +52,6 @@ teleman.purge(url, query, options);
 teleman.use(middleware);
 ```
 
-### Node.js
-Node.js v18+ included native fetch.
-
 ## Constructor
 ```js
 new Teleman({ base, headers, parseResponseBody = true, throwFailedResponse = true})
@@ -81,16 +72,16 @@ According to `content-type` header of the response, it will use different method
 * `application/json`: `response.json()`
 * `text/*`: `response.text()`
 * `multipart/form-data`: `response.formData()`
-* Others: Won't read, manully handle the response in the middleware.
+* Others: return `response` object as is.
 
 If you turn off `parseResponseBody`, you need to handle response body in the middleware.
 ```js
 const api = new Teleman({ parseResponseBody: false })
 
 api.use(async(ctx, next) => {
-  await next()
-  return ctx.response.json()
-})
+  const res = await next();
+  return res.json();
+});
 ```
 
 ### throwFailedResponse
@@ -111,10 +102,8 @@ teleman.fetch(url, {
   parseResponseBody = this.parseResponseBody,
   throwFailedResponse = this.throwFailedResponse,
   use = this.middleware,
-  useBefore = [],
-  useAfter = [],
-  ...rest } = {}
-)
+  ...rest 
+} = {})
 ```
 
 #### Parameters
@@ -159,13 +148,7 @@ If the body is a plain object, it will be converted to other type according to `
 `Boolean`. Whether to throw when `response.ok` is `false`.
 
 ##### use
-`Array[function]`. Middleware functions to use. Defaults to the middleware functions added by `teleman.use()`.  
-
-##### useBefore
-`Array[function]`. Applies middleware functions before `use`.  
-
-##### useAfter
-`Array[function]`. Applies middleware functions after `use`.  
+`Array<Middleware>`. Middleware functions to use. Defaults to `instance.middleware` array.  
 
 ##### ...rest
 Other params will be set into the context object.
@@ -189,33 +172,30 @@ teleman.head(url, query, options)
 teleman.purge(url, query, options)
 ```
 
-### teleman.use(middleware, beginning = false)
-Add the given middleware function to the instance.
+### teleman.use(middleware)
+Add the given middleware to `instance.middleware` array.
 
 #### Parameters
 ##### middleware
 `Function`. The middleware function to use.
 
-##### beginning
-`Boolean`. Inserts the middleware function at the beginning of middleware chain. Defaults to `false`.
-
 ```js
 api.use(async(ctx, next) => {
-  const start = Date.now()
-  const data = await next()
-  const ms = Date.now() - start
-  console.log(`${ctx.options.method} ${ctx.url.href} - ${ms}ms`)
-  return data
-})
+  const start = Date.now();
+  const data = await next();
+  const ms = Date.now() - start;
+  console.log(`${ctx.options.method} ${ctx.url.href} - ${ms}ms`);
+  return data;
+});
 
 api.use(async(ctx, next) => {
   try {
-    return await next()
+    return await next();
   } catch (e) {
-    alert(e ? e.message || e : 'fetch failed')
-    throw e
+    alert(e ? e.message || e : 'fetch failed');
+    throw e;
   }
-})
+});
 ```
 
 #### ctx
@@ -242,9 +222,3 @@ Finally it should return the data.
 ## License
 
 [MIT](LICENSE)
-
-## Big Thanks
-
-Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs][homepage]
-
-[homepage]: https://saucelabs.com
