@@ -28,7 +28,7 @@ export declare type MiddlewareCtx = {
     response?: Response;
     [name: string]: unknown;
 };
-export declare type Middleware = (ctx: MiddlewareCtx, next: () => unknown) => unknown;
+export declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => unknown;
 export declare type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
 export declare type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 declare class Teleman {

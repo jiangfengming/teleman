@@ -33,7 +33,7 @@ test('should fetch with correct url', () =>
   api.fetch('/', { use: [ctx => expect(ctx.url.href).toBe('http://localhost:3000/')] })
 );
 
-test('should read the response body if content-type is application/json', async() => {
+test('should read the response body if the response content-type is application/json', async() => {
   const res = <Record<string, unknown>> await api.fetch('/headers');
   expect(res.url).toBe('/headers');
 });
@@ -59,14 +59,14 @@ test('should convert body type of object to JSON by default', () =>
   }] })
 );
 
-test('should convert body type of object to FormData if content-type is set to multipart/form-data', () =>
+test('should convert body type of object to FormData if the request content-type is set to multipart/form-data', () =>
   api.post('/', { a: 1, b: 2 }, {
     headers: { 'content-type': 'multipart/form-data' },
     use: [ctx => expect(ctx.options.body).toBeInstanceOf(FormData)]
   })
 );
 
-test('should convert body type of object to URLSearchParams if content-type is set to application/x-www-form-urlencoded', () =>
+test('should convert body type of object to URLSearchParams if the request content-type is set to application/x-www-form-urlencoded', () =>
   api.post('/', { a: 1, b: 2 }, {
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     use: [ctx => expect(ctx.options.body).toBeInstanceOf(URLSearchParams)]

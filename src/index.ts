@@ -20,7 +20,6 @@ export type ReqOptions = {
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
 export type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
-
 export type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 
 export type MiddlewareCtx = {
@@ -37,10 +36,9 @@ export type MiddlewareCtx = {
   [name: string]: unknown;
 };
 
-export type Middleware = (ctx: MiddlewareCtx, next: () => unknown) => unknown;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => unknown;
 export type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
-
 export type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 
 function createURLSearchParams(query: Query) {
