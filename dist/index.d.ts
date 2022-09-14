@@ -9,8 +9,6 @@ export declare type ReqOptions = {
     query?: URLSearchParams | string | Record<string, PrimitiveType> | [string, PrimitiveType][];
     params?: Record<string, string | number | boolean>;
     body?: ReqBody | SerializableData;
-    parseResponseBody?: boolean;
-    throwFailedResponse?: boolean;
     use?: Middleware[];
     [index: string]: unknown;
 };
@@ -24,7 +22,6 @@ export declare type MiddlewareCtx = {
         headers: Headers;
         body: ReqBody;
     };
-    parseResponseBody: boolean;
     response?: Response;
     [name: string]: unknown;
 };
@@ -34,17 +31,13 @@ export declare type FormBody = Record<string, PrimitiveType | Blob> | [string, P
 declare class Teleman {
     base?: string;
     headers: Headers;
-    parseResponseBody: boolean;
-    throwFailedResponse: boolean;
     middleware: Middleware[];
-    constructor({ base, headers, parseResponseBody, throwFailedResponse }?: {
+    constructor({ base, headers }?: {
         base?: string;
         headers?: Headers | Record<string, string>;
-        parseResponseBody?: boolean;
-        throwFailedResponse?: boolean;
     });
-    use(middleware: Middleware): void;
-    fetch<T>(path: string, { method, base, headers, query, params, body, parseResponseBody, throwFailedResponse, use, ...rest }?: ReqOptions): Promise<T>;
+    use(middleware: Middleware): this;
+    fetch<T>(path: string, { method, base, headers, query, params, body, use, ...rest }?: ReqOptions): Promise<T>;
     get<T>(path: string, query?: Query, options?: ReqOptions): Promise<T>;
     post<T>(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<T>;
     put<T>(path: string, body?: ReqBody | SerializableData, options?: ReqOptions): Promise<T>;

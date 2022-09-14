@@ -5,7 +5,7 @@ A tiny (~2kb after gzipped) `fetch` API wrapper.
 ## Features
 * Tiny, only about 2kb after gzipped.
 * Support middleware.
-* Return decoded response body by default.
+* Return decoded response body.
 * Handle `response.ok` for you.
 
 ## Installation
@@ -54,7 +54,7 @@ teleman.use(middleware);
 
 ## Constructor
 ```js
-new Teleman({ base, headers, parseResponseBody = true, throwFailedResponse = true})
+new Teleman({ base, headers })
 ```
 
 Creates a Teleman instance.
@@ -66,41 +66,18 @@ Creates a Teleman instance.
 `Object`. Optional. Default headers. It can be a simple key-value object or
 [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers) object.
 
-### parseResponseBody
-`Boolean`. Optional. Defaults to `true`. Whether to auto read the response body.
-According to `content-type` header of the response, it will use different methods:
-* `application/json`: `response.json()`
-* `text/*`: `response.text()`
-* `multipart/form-data`: `response.formData()`
-* Others: return `response` object as is.
+## Methods
 
-If you turn off `parseResponseBody`, you need to handle response body in the middleware.
-```js
-const api = new Teleman({ parseResponseBody: false })
-
-api.use(async(ctx, next) => {
-  const res = await next();
-  return res.json();
-});
-```
-
-### throwFailedResponse
-`Boolean`. Optional. Defaults to `true`. If `response.ok` is `false`, throw the response body.
-
-## Instance methods
-
-### teleman.fetch()
+### instance.fetch()
 
 ```js
-teleman.fetch(url, {
+instance.fetch(url, {
   method = 'GET',
   base = this.base,
   headers,
   query,
   params = {},
   body,
-  parseResponseBody = this.parseResponseBody,
-  throwFailedResponse = this.throwFailedResponse,
   use = this.middleware,
   ...rest 
 } = {})
@@ -129,7 +106,7 @@ The query string appends to the URL. It takes the same format as
 ##### params
 `Object`. URL path params.
 ```js
-teleman.fetch('/articles/:id', { params: { id: 1 } })
+instance.fetch('/articles/:id', { params: { id: 1 } })
 ```
 It will use `encodeURIComponent()` to encode the values.
 
@@ -141,61 +118,63 @@ If the body is a plain object, it will be converted to other type according to `
 * `multipart/form-data`: to FormData.
 * `application/x-www-form-urlencoded`: to URLSearchParams.
 
-##### parseResponseBody
-`Boolean`. Whether to read response body.  
-
-##### throwFailedResponse
-`Boolean`. Whether to throw when `response.ok` is `false`.
 
 ##### use
 `Array<Middleware>`. Middleware functions to use. Defaults to `instance.middleware` array.  
 
 ##### ...rest
-Other params will be set into the context object.
+Other parameters will be set into the context object.
 
-#### Returns
-`teleman.fetch()` returns a promise.
-* If `response.ok` is `true`, the promise will be resolved with the response body, otherwise it will be rejected with
-the response body.
-* If `parseResponseBody` is set to `false`, or `content-type` can't be handled, the promise will be resolved or rejected with
-no value, depending on `response.ok`. In this case, you should handle the response your self in the middleware.
-* If any error occurs, the promise will be rejected with the error.
+#### Return Value
+`instance.fetch()` returns a promise.
+
+According to `content-type` header of the response, it will resolve/reject (depends on `response.ok`) to different types:
+* `application/json`: `response.json()`
+* `text/*`: `response.text()`
+* Others: the `response` object as is.
+
+If any error occurs, the promise will be rejected with that error.
 
 ### Shortcut methods
 ```js
-teleman.get(url, query, options)
-teleman.post(url, body, options)
-teleman.put(url, body, options)
-teleman.patch(url, body, options)
-teleman.delete(url, query, options)
-teleman.head(url, query, options)
-teleman.purge(url, query, options)
+instance.get(url, query, options)
+instance.post(url, body, options)
+instance.put(url, body, options)
+instance.patch(url, body, options)
+instance.delete(url, query, options)
+instance.head(url, query, options)
+instance.purge(url, query, options)
 ```
 
-### teleman.use(middleware)
-Add the given middleware to `instance.middleware` array.
+### instance.use(middleware)
+Add the given middleware to `instance.middleware` array. It returns `this` so is chainable.
 
 #### Parameters
 ##### middleware
 `Function`. The middleware function to use.
 
 ```js
-api.use(async(ctx, next) => {
-  const start = Date.now();
-  const data = await next();
-  const ms = Date.now() - start;
-  console.log(`${ctx.options.method} ${ctx.url.href} - ${ms}ms`);
-  return data;
-});
-
-api.use(async(ctx, next) => {
-  try {
-    return await next();
-  } catch (e) {
-    alert(e ? e.message || e : 'fetch failed');
-    throw e;
-  }
-});
+instance
+  .use(async(ctx, next) => {
+    try {
+      return await next();
+    } catch (e) {
+      alert(e?.message || 'fetch failed');
+      throw e;
+    }
+  });
+  .use(async(ctx, next) => {
+    const start = Date.now();
+    const data = await next();
+    const ms = Date.now() - start;
+    console.log(`${ctx.options.method} ${ctx.url.href} - ${ms}ms`);
+    
+    // you can modify the data then return it
+    return {
+      ...data,
+      foo: data.foo || 0
+    };
+  })
 ```
 
 #### ctx
@@ -204,11 +183,12 @@ api.use(async(ctx, next) => {
   url, // URL object
   options: { method, headers, body },
   response, // available after `await next()`
-  parseResponseBody,
-  ...rest
+  ...rest // additional parameters passed from `instance.fetch()` options
 }
 ```
-`url` and `options` are params of `fetch()`:
+
+`url` and `options` will be used to call the `fetch()` function:
+
 ```js
 fetch(ctx.url.href, ctx.options)
 ```
@@ -216,7 +196,7 @@ fetch(ctx.url.href, ctx.options)
 You can modify the context properties to interfere the request and response.
 
 #### next
-A middleware function should receive response body from `next()`, and can optionally transform the data.
+A middleware function should receive the response body from `next()`, and can optionally modify the data.
 Finally it should return the data.
 
 ## License

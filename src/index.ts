@@ -12,8 +12,6 @@ export type ReqOptions = {
   query?: URLSearchParams | string | Record<string, PrimitiveType> | [string, PrimitiveType][];
   params?: Record<string, string | number | boolean>;
   body?: ReqBody | SerializableData;
-  parseResponseBody?: boolean;
-  throwFailedResponse?: boolean;
   use?: Middleware[];
   [index: string]: unknown;
 };
@@ -31,7 +29,6 @@ export type MiddlewareCtx = {
     body: ReqBody;
   };
 
-  parseResponseBody: boolean;
   response?: Response;
   [name: string]: unknown;
 };
@@ -84,20 +81,14 @@ function createFormData(data: FormBody) {
 class Teleman {
   base?: string;
   headers: Headers;
-  parseResponseBody: boolean;
-  throwFailedResponse: boolean;
   middleware: Middleware[] = [];
 
   constructor({
     base,
-    headers,
-    parseResponseBody = true,
-    throwFailedResponse = true
+    headers
   }: {
     base?: string;
     headers?: Headers | Record<string, string>;
-    parseResponseBody?: boolean;
-    throwFailedResponse?: boolean;
   } = {}) {
     if (base) {
       this.base = base;
@@ -111,12 +102,11 @@ class Teleman {
     }
 
     this.headers = new Headers(headers);
-    this.parseResponseBody = parseResponseBody;
-    this.throwFailedResponse = throwFailedResponse;
   }
 
   use(middleware: Middleware) {
     this.middleware.push(middleware);
+    return this;
   }
 
   async fetch<T>(path: string, {
@@ -126,8 +116,6 @@ class Teleman {
     query,
     params = {},
     body,
-    parseResponseBody = this.parseResponseBody,
-    throwFailedResponse = this.throwFailedResponse,
     use = this.middleware,
     ...rest
   }: ReqOptions = {}): Promise<T> {
@@ -151,11 +139,11 @@ class Teleman {
     }
 
     if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
-      const contentType = headers.get('Content-Type') || '';
+      const contentType = headers.get('content-type') || '';
 
       if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
-        if (!headers.has('Content-Type')) {
-          headers.set('Content-Type', 'application/json');
+        if (!headers.has('content-type')) {
+          headers.set('content-type', 'application/json');
         }
 
         body = JSON.stringify(body);
@@ -175,7 +163,6 @@ class Teleman {
         body: body as ReqBody
       },
 
-      parseResponseBody,
       ...rest
     };
 
@@ -184,21 +171,19 @@ class Teleman {
         ctx.response = response;
         let body: Promise<unknown> = Promise.resolve(response);
 
-        if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
-          const responseType = response.headers.get('Content-Type');
+        if (!['HEAD', 'head'].includes(ctx.options.method)) {
+          const responseType = response.headers.get('content-type');
 
           if (responseType) {
             if (responseType.startsWith('application/json')) {
               body = response.json();
             } else if (responseType.startsWith('text/')) {
               body = response.text();
-            } else if (responseType.startsWith('multipart/form-data')) {
-              body = response.formData();
             }
           }
         }
 
-        if (response.ok || !throwFailedResponse) {
+        if (response.ok) {
           return body;
         } else {
           return body.then(e => {

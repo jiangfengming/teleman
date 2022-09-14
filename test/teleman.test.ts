@@ -93,10 +93,6 @@ test('should throw error if fetch failed', async() =>
   await expect(api.get('http://127.0.0.1:65535/')).rejects.toThrow()
 );
 
-test('should not throw if throwFailedResponse set to false', async() =>
-  await expect(api.fetch('/404', { throwFailedResponse: false })).resolves.not.toThrow()
-);
-
 test('should run middleware', async() =>
   await expect(api2.get('/404')).rejects.toStrictEqual({ code: 404, message: 'Not Found' })
 );

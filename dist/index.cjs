@@ -43,10 +43,8 @@ function createFormData(data) {
 class Teleman {
     base;
     headers;
-    parseResponseBody;
-    throwFailedResponse;
     middleware = [];
-    constructor({ base, headers, parseResponseBody = true, throwFailedResponse = true } = {}) {
+    constructor({ base, headers } = {}) {
         if (base) {
             this.base = base;
         }
@@ -60,13 +58,12 @@ class Teleman {
             }
         }
         this.headers = new Headers(headers);
-        this.parseResponseBody = parseResponseBody;
-        this.throwFailedResponse = throwFailedResponse;
     }
     use(middleware) {
         this.middleware.push(middleware);
+        return this;
     }
-    async fetch(path, { method = 'GET', base = this.base, headers, query, params = {}, body, parseResponseBody = this.parseResponseBody, throwFailedResponse = this.throwFailedResponse, use = this.middleware, ...rest } = {}) {
+    async fetch(path, { method = 'GET', base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
         method = method.toUpperCase();
         const url = new URL(path.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base);
         if (query) {
@@ -84,10 +81,10 @@ class Teleman {
             headers = new Headers(this.headers || headers);
         }
         if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
-            const contentType = headers.get('Content-Type') || '';
+            const contentType = headers.get('content-type') || '';
             if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
-                if (!headers.has('Content-Type')) {
-                    headers.set('Content-Type', 'application/json');
+                if (!headers.has('content-type')) {
+                    headers.set('content-type', 'application/json');
                 }
                 body = JSON.stringify(body);
             }
@@ -105,14 +102,13 @@ class Teleman {
                 headers,
                 body: body
             },
-            parseResponseBody,
             ...rest
         };
         return compose__default["default"](use)(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
             ctx.response = response;
             let body = Promise.resolve(response);
-            if (parseResponseBody && ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'PURGE'].includes(ctx.options.method.toUpperCase())) {
-                const responseType = response.headers.get('Content-Type');
+            if (!['HEAD', 'head'].includes(ctx.options.method)) {
+                const responseType = response.headers.get('content-type');
                 if (responseType) {
                     if (responseType.startsWith('application/json')) {
                         body = response.json();
@@ -120,12 +116,9 @@ class Teleman {
                     else if (responseType.startsWith('text/')) {
                         body = response.text();
                     }
-                    else if (responseType.startsWith('multipart/form-data')) {
-                        body = response.formData();
-                    }
                 }
             }
-            if (response.ok || !throwFailedResponse) {
+            if (response.ok) {
                 return body;
             }
             else {
