@@ -1,3 +1,7 @@
+function getDefaultExportFromCjs (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
 /**
  * Expose compositor.
  */
@@ -45,6 +49,8 @@ function compose (middleware) {
   }
 }
 
+var compose$1 = /*@__PURE__*/getDefaultExportFromCjs(koaCompose);
+
 function createURLSearchParams(query) {
     if (query.constructor === String) {
         return new URLSearchParams(query);
@@ -81,7 +87,7 @@ class Teleman {
     base;
     headers;
     middleware = [];
-    constructor({ base, headers } = {}) {
+    constructor({ base, headers, } = {}) {
         if (base) {
             this.base = base;
         }
@@ -100,9 +106,9 @@ class Teleman {
         this.middleware.push(middleware);
         return this;
     }
-    async fetch(path, { method = 'GET', base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
+    async fetch(path, { method = "GET", base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
         method = method.toUpperCase();
-        const url = new URL(path.replace(/:([a-z]\w*)/ig, (_, w) => encodeURIComponent(params[w])), base);
+        const url = new URL(path.replace(/:([a-z]\w*)/gi, (_, w) => encodeURIComponent(params[w])), base);
         if (query) {
             if (!(query instanceof URLSearchParams)) {
                 query = createURLSearchParams(query);
@@ -117,18 +123,25 @@ class Teleman {
         else {
             headers = new Headers(this.headers || headers);
         }
-        if (body !== undefined && body !== null && !['GET', 'HEAD'].includes(method)) {
-            const contentType = headers.get('content-type') || '';
-            if (!contentType && body && body.constructor === Object || contentType.startsWith('application/json')) {
-                if (!headers.has('content-type')) {
-                    headers.set('content-type', 'application/json');
+        if (body !== undefined &&
+            body !== null &&
+            !["GET", "HEAD"].includes(method)) {
+            const contentType = headers.get("content-type") || "";
+            if ((!contentType && body && body.constructor === Object) ||
+                contentType.startsWith("application/json")) {
+                if (!headers.has("content-type")) {
+                    headers.set("content-type", "application/json");
                 }
                 body = JSON.stringify(body);
             }
-            else if (contentType.startsWith('multipart/form-data') && body && !(body instanceof FormData)) {
+            else if (contentType.startsWith("multipart/form-data") &&
+                body &&
+                !(body instanceof FormData)) {
                 body = createFormData(body);
             }
-            else if (contentType.startsWith('application/x-www-form-urlencoded') && body && !(body instanceof URLSearchParams)) {
+            else if (contentType.startsWith("application/x-www-form-urlencoded") &&
+                body &&
+                !(body instanceof URLSearchParams)) {
                 body = createURLSearchParams(body);
             }
         }
@@ -137,20 +150,20 @@ class Teleman {
             options: {
                 method,
                 headers,
-                body: body
+                body: body,
             },
-            ...rest
+            ...rest,
         };
-        return koaCompose(use)(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
+        return compose$1(use)(ctx, () => fetch(ctx.url.href, ctx.options).then((response) => {
             ctx.response = response;
             let body = Promise.resolve(response);
-            if (!['HEAD', 'head'].includes(ctx.options.method)) {
-                const responseType = response.headers.get('content-type');
+            if (!["HEAD", "head"].includes(ctx.options.method)) {
+                const responseType = response.headers.get("content-type");
                 if (responseType) {
-                    if (responseType.startsWith('application/json')) {
+                    if (responseType.startsWith("application/json")) {
                         body = response.json();
                     }
-                    else if (responseType.startsWith('text/')) {
+                    else if (responseType.startsWith("text/")) {
                         body = response.text();
                     }
                 }
@@ -159,7 +172,7 @@ class Teleman {
                 return body;
             }
             else {
-                return body.then(e => {
+                return body.then((e) => {
                     throw e;
                 });
             }
@@ -168,50 +181,50 @@ class Teleman {
     get(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: 'GET',
-            query
+            method: "GET",
+            query,
         });
     }
     post(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: 'POST',
-            body
+            method: "POST",
+            body,
         });
     }
     put(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: 'PUT',
-            body
+            method: "PUT",
+            body,
         });
     }
     patch(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: 'PATCH',
-            body
+            method: "PATCH",
+            body,
         });
     }
     delete(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: 'DELETE',
-            query
+            method: "DELETE",
+            query,
         });
     }
     head(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: 'HEAD',
-            query
+            method: "HEAD",
+            query,
         });
     }
     purge(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: 'PURGE',
-            query
+            method: "PURGE",
+            query,
         });
     }
 }

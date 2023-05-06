@@ -1,8 +1,8 @@
-export declare type PrimitiveType = string | number | boolean | null | undefined;
-export declare type SerializableData = string | number | boolean | null | undefined | SerializableData[] | {
+export type PrimitiveType = string | number | boolean | null | undefined;
+export type SerializableData = string | number | boolean | null | undefined | SerializableData[] | {
     [name: string]: SerializableData;
 };
-export declare type ReqOptions = {
+export type ReqOptions = {
     method?: Method | MethodLowercase;
     base?: string;
     headers?: Headers | Record<string, string>;
@@ -12,10 +12,10 @@ export declare type ReqOptions = {
     use?: Middleware[];
     [index: string]: unknown;
 };
-export declare type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
-export declare type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
-export declare type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
-export declare type MiddlewareCtx = {
+export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "PURGE";
+export type MethodLowercase = "get" | "post" | "put" | "delete" | "patch" | "head" | "purge";
+export type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
+export type MiddlewareCtx = {
     url: URL;
     options: {
         method: Method;
@@ -25,14 +25,14 @@ export declare type MiddlewareCtx = {
     response?: Response;
     [name: string]: unknown;
 };
-export declare type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => unknown;
-export declare type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
-export declare type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
+export type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => unknown;
+export type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
+export type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
 declare class Teleman {
     base?: string;
     headers: Headers;
     middleware: Middleware[];
-    constructor({ base, headers }?: {
+    constructor({ base, headers, }?: {
         base?: string;
         headers?: Headers | Record<string, string>;
     });

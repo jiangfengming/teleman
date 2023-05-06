@@ -2,23 +2,16 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
 
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
 
   "extends": [
-    "unambiguous",
-    "plugin:@typescript-eslint/recommended"
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
 
   "env": {
     "browser": true,
     "node": true
-  },
-
-  "rules": {
-    "no-extra-parens": "off",
-    "@typescript-eslint/no-extra-parens": "error",
-    "@typescript-eslint/member-delimiter-style": "error"
   }
 }
