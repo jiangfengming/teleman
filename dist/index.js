@@ -67,7 +67,7 @@ function createURLSearchParams(query) {
     return q;
 }
 function createFormData(data) {
-    if (data.constructor === Object) {
+    if (Object.prototype.toString.call(data) === "[object Object]") {
         data = Object.entries(data);
     }
     const f = new FormData();
@@ -127,7 +127,9 @@ class Teleman {
             body !== null &&
             !["GET", "HEAD"].includes(method)) {
             const contentType = headers.get("content-type") || "";
-            if ((!contentType && body && body.constructor === Object) ||
+            if ((!contentType &&
+                body &&
+                Object.prototype.toString.call(body) === "[object Object]") ||
                 contentType.startsWith("application/json")) {
                 if (!headers.has("content-type")) {
                     headers.set("content-type", "application/json");
