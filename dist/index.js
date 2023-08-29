@@ -55,7 +55,7 @@ function createURLSearchParams(query) {
     if (query.constructor === String) {
         return new URLSearchParams(query);
     }
-    if (query.constructor === Object) {
+    if (Object.prototype.toString.call(query) === "[object Object]") {
         query = Object.entries(query);
     }
     const q = new URLSearchParams();
