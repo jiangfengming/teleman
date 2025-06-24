@@ -8,7 +8,7 @@ function createURLSearchParams(query) {
     if (query.constructor === String) {
         return new URLSearchParams(query);
     }
-    if (Object.prototype.toString.call(query) === "[object Object]") {
+    if (Object.prototype.toString.call(query) === '[object Object]') {
         query = Object.entries(query);
     }
     const q = new URLSearchParams();
@@ -20,7 +20,7 @@ function createURLSearchParams(query) {
     return q;
 }
 function createFormData(data) {
-    if (Object.prototype.toString.call(data) === "[object Object]") {
+    if (Object.prototype.toString.call(data) === '[object Object]') {
         data = Object.entries(data);
     }
     const f = new FormData();
@@ -40,7 +40,7 @@ class Teleman {
     base;
     headers;
     middleware = [];
-    constructor({ base, headers, } = {}) {
+    constructor({ base, headers } = {}) {
         if (base) {
             this.base = base;
         }
@@ -59,7 +59,7 @@ class Teleman {
         this.middleware.push(middleware);
         return this;
     }
-    async fetch(path, { method = "GET", base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
+    async fetch(path, { method = 'GET', base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
         method = method.toUpperCase();
         const url = new URL(path.replace(/:([a-z]\w*)/gi, (_, w) => encodeURIComponent(params[w])), base);
         if (query) {
@@ -78,23 +78,23 @@ class Teleman {
         }
         if (body !== undefined &&
             body !== null &&
-            !["GET", "HEAD"].includes(method)) {
-            const contentType = headers.get("content-type") || "";
+            !['GET', 'HEAD'].includes(method)) {
+            const contentType = headers.get('content-type') || '';
             if ((!contentType &&
                 body &&
-                Object.prototype.toString.call(body) === "[object Object]") ||
-                contentType.startsWith("application/json")) {
-                if (!headers.has("content-type")) {
-                    headers.set("content-type", "application/json");
+                Object.prototype.toString.call(body) === '[object Object]') ||
+                contentType.startsWith('application/json')) {
+                if (!headers.has('content-type')) {
+                    headers.set('content-type', 'application/json');
                 }
                 body = JSON.stringify(body);
             }
-            else if (contentType.startsWith("multipart/form-data") &&
+            else if (contentType.startsWith('multipart/form-data') &&
                 body &&
                 !(body instanceof FormData)) {
                 body = createFormData(body);
             }
-            else if (contentType.startsWith("application/x-www-form-urlencoded") &&
+            else if (contentType.startsWith('application/x-www-form-urlencoded') &&
                 body &&
                 !(body instanceof URLSearchParams)) {
                 body = createURLSearchParams(body);
@@ -105,20 +105,20 @@ class Teleman {
             options: {
                 method,
                 headers,
-                body: body,
+                body: body
             },
-            ...rest,
+            ...rest
         };
-        return compose(use)(ctx, () => fetch(ctx.url.href, ctx.options).then((response) => {
+        return compose(use)(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
             ctx.response = response;
             let body = Promise.resolve(response);
-            if (!["HEAD", "head"].includes(ctx.options.method)) {
-                const responseType = response.headers.get("content-type");
+            if (!['HEAD', 'head'].includes(ctx.options.method)) {
+                const responseType = response.headers.get('content-type');
                 if (responseType) {
-                    if (responseType.startsWith("application/json")) {
+                    if (responseType.startsWith('application/json')) {
                         body = response.json();
                     }
-                    else if (responseType.startsWith("text/")) {
+                    else if (responseType.startsWith('text/')) {
                         body = response.text();
                     }
                 }
@@ -127,7 +127,7 @@ class Teleman {
                 return body;
             }
             else {
-                return body.then((e) => {
+                return body.then(e => {
                     throw e;
                 });
             }
@@ -136,56 +136,58 @@ class Teleman {
     get(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "GET",
-            query,
+            method: 'GET',
+            query
         });
     }
     post(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "POST",
-            body,
+            method: 'POST',
+            body
         });
     }
     put(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "PUT",
-            body,
+            method: 'PUT',
+            body
         });
     }
     patch(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "PATCH",
-            body,
+            method: 'PATCH',
+            body
         });
     }
     delete(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "DELETE",
-            query,
+            method: 'DELETE',
+            query
         });
     }
     head(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "HEAD",
-            query,
+            method: 'HEAD',
+            query
         });
     }
     purge(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "PURGE",
-            query,
+            method: 'PURGE',
+            query
         });
     }
 }
 const teleman = new Teleman();
 
 exports.Teleman = Teleman;
+exports.createFormData = createFormData;
+exports.createURLSearchParams = createURLSearchParams;
 exports.default = Teleman;
 exports.teleman = teleman;
 //# sourceMappingURL=index.cjs.map

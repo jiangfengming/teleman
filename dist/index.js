@@ -2,60 +2,70 @@ function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
-/**
- * Expose compositor.
- */
+var koaCompose;
+var hasRequiredKoaCompose;
 
-var koaCompose = compose;
+function requireKoaCompose () {
+	if (hasRequiredKoaCompose) return koaCompose;
+	hasRequiredKoaCompose = 1;
 
-/**
- * Compose `middleware` returning
- * a fully valid middleware comprised
- * of all those which are passed.
- *
- * @param {Array} middleware
- * @return {Function}
- * @api public
- */
+	/**
+	 * Expose compositor.
+	 */
 
-function compose (middleware) {
-  if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!')
-  for (const fn of middleware) {
-    if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!')
-  }
+	koaCompose = compose;
 
-  /**
-   * @param {Object} context
-   * @return {Promise}
-   * @api public
-   */
+	/**
+	 * Compose `middleware` returning
+	 * a fully valid middleware comprised
+	 * of all those which are passed.
+	 *
+	 * @param {Array} middleware
+	 * @return {Function}
+	 * @api public
+	 */
 
-  return function (context, next) {
-    // last called middleware #
-    let index = -1;
-    return dispatch(0)
-    function dispatch (i) {
-      if (i <= index) return Promise.reject(new Error('next() called multiple times'))
-      index = i;
-      let fn = middleware[i];
-      if (i === middleware.length) fn = next;
-      if (!fn) return Promise.resolve()
-      try {
-        return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
-      } catch (err) {
-        return Promise.reject(err)
-      }
-    }
-  }
+	function compose (middleware) {
+	  if (!Array.isArray(middleware)) throw new TypeError('Middleware stack must be an array!')
+	  for (const fn of middleware) {
+	    if (typeof fn !== 'function') throw new TypeError('Middleware must be composed of functions!')
+	  }
+
+	  /**
+	   * @param {Object} context
+	   * @return {Promise}
+	   * @api public
+	   */
+
+	  return function (context, next) {
+	    // last called middleware #
+	    let index = -1;
+	    return dispatch(0)
+	    function dispatch (i) {
+	      if (i <= index) return Promise.reject(new Error('next() called multiple times'))
+	      index = i;
+	      let fn = middleware[i];
+	      if (i === middleware.length) fn = next;
+	      if (!fn) return Promise.resolve()
+	      try {
+	        return Promise.resolve(fn(context, dispatch.bind(null, i + 1)));
+	      } catch (err) {
+	        return Promise.reject(err)
+	      }
+	    }
+	  }
+	}
+	return koaCompose;
 }
 
-var compose$1 = /*@__PURE__*/getDefaultExportFromCjs(koaCompose);
+var koaComposeExports = requireKoaCompose();
+var compose = /*@__PURE__*/getDefaultExportFromCjs(koaComposeExports);
 
 function createURLSearchParams(query) {
     if (query.constructor === String) {
         return new URLSearchParams(query);
     }
-    if (Object.prototype.toString.call(query) === "[object Object]") {
+    if (Object.prototype.toString.call(query) === '[object Object]') {
         query = Object.entries(query);
     }
     const q = new URLSearchParams();
@@ -67,7 +77,7 @@ function createURLSearchParams(query) {
     return q;
 }
 function createFormData(data) {
-    if (Object.prototype.toString.call(data) === "[object Object]") {
+    if (Object.prototype.toString.call(data) === '[object Object]') {
         data = Object.entries(data);
     }
     const f = new FormData();
@@ -87,7 +97,7 @@ class Teleman {
     base;
     headers;
     middleware = [];
-    constructor({ base, headers, } = {}) {
+    constructor({ base, headers } = {}) {
         if (base) {
             this.base = base;
         }
@@ -106,7 +116,7 @@ class Teleman {
         this.middleware.push(middleware);
         return this;
     }
-    async fetch(path, { method = "GET", base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
+    async fetch(path, { method = 'GET', base = this.base, headers, query, params = {}, body, use = this.middleware, ...rest } = {}) {
         method = method.toUpperCase();
         const url = new URL(path.replace(/:([a-z]\w*)/gi, (_, w) => encodeURIComponent(params[w])), base);
         if (query) {
@@ -125,23 +135,23 @@ class Teleman {
         }
         if (body !== undefined &&
             body !== null &&
-            !["GET", "HEAD"].includes(method)) {
-            const contentType = headers.get("content-type") || "";
+            !['GET', 'HEAD'].includes(method)) {
+            const contentType = headers.get('content-type') || '';
             if ((!contentType &&
                 body &&
-                Object.prototype.toString.call(body) === "[object Object]") ||
-                contentType.startsWith("application/json")) {
-                if (!headers.has("content-type")) {
-                    headers.set("content-type", "application/json");
+                Object.prototype.toString.call(body) === '[object Object]') ||
+                contentType.startsWith('application/json')) {
+                if (!headers.has('content-type')) {
+                    headers.set('content-type', 'application/json');
                 }
                 body = JSON.stringify(body);
             }
-            else if (contentType.startsWith("multipart/form-data") &&
+            else if (contentType.startsWith('multipart/form-data') &&
                 body &&
                 !(body instanceof FormData)) {
                 body = createFormData(body);
             }
-            else if (contentType.startsWith("application/x-www-form-urlencoded") &&
+            else if (contentType.startsWith('application/x-www-form-urlencoded') &&
                 body &&
                 !(body instanceof URLSearchParams)) {
                 body = createURLSearchParams(body);
@@ -152,20 +162,20 @@ class Teleman {
             options: {
                 method,
                 headers,
-                body: body,
+                body: body
             },
-            ...rest,
+            ...rest
         };
-        return compose$1(use)(ctx, () => fetch(ctx.url.href, ctx.options).then((response) => {
+        return compose(use)(ctx, () => fetch(ctx.url.href, ctx.options).then(response => {
             ctx.response = response;
             let body = Promise.resolve(response);
-            if (!["HEAD", "head"].includes(ctx.options.method)) {
-                const responseType = response.headers.get("content-type");
+            if (!['HEAD', 'head'].includes(ctx.options.method)) {
+                const responseType = response.headers.get('content-type');
                 if (responseType) {
-                    if (responseType.startsWith("application/json")) {
+                    if (responseType.startsWith('application/json')) {
                         body = response.json();
                     }
-                    else if (responseType.startsWith("text/")) {
+                    else if (responseType.startsWith('text/')) {
                         body = response.text();
                     }
                 }
@@ -174,7 +184,7 @@ class Teleman {
                 return body;
             }
             else {
-                return body.then((e) => {
+                return body.then(e => {
                     throw e;
                 });
             }
@@ -183,54 +193,54 @@ class Teleman {
     get(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "GET",
-            query,
+            method: 'GET',
+            query
         });
     }
     post(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "POST",
-            body,
+            method: 'POST',
+            body
         });
     }
     put(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "PUT",
-            body,
+            method: 'PUT',
+            body
         });
     }
     patch(path, body, options) {
         return this.fetch(path, {
             ...options,
-            method: "PATCH",
-            body,
+            method: 'PATCH',
+            body
         });
     }
     delete(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "DELETE",
-            query,
+            method: 'DELETE',
+            query
         });
     }
     head(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "HEAD",
-            query,
+            method: 'HEAD',
+            query
         });
     }
     purge(path, query, options) {
         return this.fetch(path, {
             ...options,
-            method: "PURGE",
-            query,
+            method: 'PURGE',
+            query
         });
     }
 }
 const teleman = new Teleman();
 
-export { Teleman, Teleman as default, teleman };
+export { Teleman, createFormData, createURLSearchParams, Teleman as default, teleman };
 //# sourceMappingURL=index.js.map

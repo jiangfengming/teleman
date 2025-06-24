@@ -12,8 +12,8 @@ export type ReqOptions = {
     use?: Middleware[];
     [index: string]: unknown;
 };
-export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "PURGE";
-export type MethodLowercase = "get" | "post" | "put" | "delete" | "patch" | "head" | "purge";
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'PURGE';
+export type MethodLowercase = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'purge';
 export type ReqBody = string | FormData | URLSearchParams | Blob | BufferSource | ReadableStream;
 export type MiddlewareCtx = {
     url: URL;
@@ -28,11 +28,13 @@ export type MiddlewareCtx = {
 export type Middleware = (ctx: MiddlewareCtx, next: () => Promise<any>) => unknown;
 export type Query = string | Record<string, PrimitiveType> | [string, PrimitiveType][];
 export type FormBody = Record<string, PrimitiveType | Blob> | [string, PrimitiveType | Blob, string?][];
+export declare function createURLSearchParams(query: Query): URLSearchParams;
+export declare function createFormData(data: FormBody): FormData;
 declare class Teleman {
     base?: string;
     headers: Headers;
     middleware: Middleware[];
-    constructor({ base, headers, }?: {
+    constructor({ base, headers }?: {
         base?: string;
         headers?: Headers | Record<string, string>;
     });

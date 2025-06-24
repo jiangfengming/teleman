@@ -1,6 +1,6 @@
-import compose from "koa-compose";
+import compose from 'koa-compose'
 
-export type PrimitiveType = string | number | boolean | null | undefined;
+export type PrimitiveType = string | number | boolean | null | undefined
 
 export type SerializableData =
   | string
@@ -9,98 +9,98 @@ export type SerializableData =
   | null
   | undefined
   | SerializableData[]
-  | { [name: string]: SerializableData };
+  | { [name: string]: SerializableData }
 
 export type ReqOptions = {
-  method?: Method | MethodLowercase;
-  base?: string;
-  headers?: Headers | Record<string, string>;
+  method?: Method | MethodLowercase
+  base?: string
+  headers?: Headers | Record<string, string>
   query?:
     | URLSearchParams
     | string
     | Record<string, PrimitiveType>
-    | [string, PrimitiveType][];
-  params?: Record<string, string | number | boolean>;
-  body?: ReqBody | SerializableData;
-  use?: Middleware[];
-  [index: string]: unknown;
-};
+    | [string, PrimitiveType][]
+  params?: Record<string, string | number | boolean>
+  body?: ReqBody | SerializableData
+  use?: Middleware[]
+  [index: string]: unknown
+}
 
 export type Method =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "PATCH"
-  | "HEAD"
-  | "PURGE";
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'DELETE'
+  | 'PATCH'
+  | 'HEAD'
+  | 'PURGE'
 export type MethodLowercase =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "head"
-  | "purge";
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'head'
+  | 'purge'
 export type ReqBody =
   | string
   | FormData
   | URLSearchParams
   | Blob
   | BufferSource
-  | ReadableStream;
+  | ReadableStream
 
 export type MiddlewareCtx = {
-  url: URL;
+  url: URL
 
   options: {
-    method: Method;
-    headers: Headers;
-    body: ReqBody;
-  };
+    method: Method
+    headers: Headers
+    body: ReqBody
+  }
 
-  response?: Response;
-  [name: string]: unknown;
-};
+  response?: Response
+  [name: string]: unknown
+}
 
 export type Middleware = (
   ctx: MiddlewareCtx,
   next: () => Promise<any> // eslint-disable-line @typescript-eslint/no-explicit-any
-) => unknown;
+) => unknown
 export type Query =
   | string
   | Record<string, PrimitiveType>
-  | [string, PrimitiveType][];
+  | [string, PrimitiveType][]
 export type FormBody =
   | Record<string, PrimitiveType | Blob>
-  | [string, PrimitiveType | Blob, string?][];
+  | [string, PrimitiveType | Blob, string?][]
 
-function createURLSearchParams(query: Query) {
+export function createURLSearchParams(query: Query) {
   if (query.constructor === String) {
-    return new URLSearchParams(query);
+    return new URLSearchParams(query)
   }
 
-  if (Object.prototype.toString.call(query) === "[object Object]") {
-    query = Object.entries(query);
+  if (Object.prototype.toString.call(query) === '[object Object]') {
+    query = Object.entries(query)
   }
 
-  const q = new URLSearchParams();
+  const q = new URLSearchParams()
 
   for (const [name, value] of query as [string, PrimitiveType][]) {
     if (value !== null && value !== undefined) {
-      q.append(name, value as string);
+      q.append(name, value as string)
     }
   }
 
-  return q;
+  return q
 }
 
-function createFormData(data: FormBody) {
-  if (Object.prototype.toString.call(data) === "[object Object]") {
-    data = Object.entries(data);
+export function createFormData(data: FormBody) {
+  if (Object.prototype.toString.call(data) === '[object Object]') {
+    data = Object.entries(data)
   }
 
-  const f = new FormData();
+  const f = new FormData()
 
   for (const [name, value, filename] of data as [
     string,
@@ -109,51 +109,51 @@ function createFormData(data: FormBody) {
   ][]) {
     if (value !== null && value !== undefined) {
       if (filename) {
-        f.append(name, value as Blob, filename);
+        f.append(name, value as Blob, filename)
       } else {
-        f.append(name, value as string);
+        f.append(name, value as string)
       }
     }
   }
 
-  return f;
+  return f
 }
 
 class Teleman {
-  base?: string;
-  headers: Headers;
-  middleware: Middleware[] = [];
+  base?: string
+  headers: Headers
+  middleware: Middleware[] = []
 
   constructor({
     base,
-    headers,
+    headers
   }: {
-    base?: string;
-    headers?: Headers | Record<string, string>;
+    base?: string
+    headers?: Headers | Record<string, string>
   } = {}) {
     if (base) {
-      this.base = base;
+      this.base = base
     } else {
       try {
         // defaults to document.baseURI in browser
-        this.base = document.baseURI;
+        this.base = document.baseURI
       } catch (e) {
         // in node.js, ignore
       }
     }
 
-    this.headers = new Headers(headers);
+    this.headers = new Headers(headers)
   }
 
   use(middleware: Middleware) {
-    this.middleware.push(middleware);
-    return this;
+    this.middleware.push(middleware)
+    return this
   }
 
   async fetch<T>(
     path: string,
     {
-      method = "GET",
+      method = 'GET',
       base = this.base,
       headers,
       query,
@@ -163,58 +163,58 @@ class Teleman {
       ...rest
     }: ReqOptions = {}
   ): Promise<T> {
-    method = method.toUpperCase() as Method;
+    method = method.toUpperCase() as Method
     const url = new URL(
       path.replace(/:([a-z]\w*)/gi, (_, w) => encodeURIComponent(params[w])),
       base
-    );
+    )
 
     if (query) {
       if (!(query instanceof URLSearchParams)) {
-        query = createURLSearchParams(query);
+        query = createURLSearchParams(query)
       }
 
-      query.forEach((value, name) => url.searchParams.append(name, value));
+      query.forEach((value, name) => url.searchParams.append(name, value))
     }
 
     if (this.headers && headers) {
-      const h = new Headers(this.headers);
-      new Headers(headers).forEach((value, name) => h.set(name, value));
-      headers = h;
+      const h = new Headers(this.headers)
+      new Headers(headers).forEach((value, name) => h.set(name, value))
+      headers = h
     } else {
-      headers = new Headers(this.headers || headers);
+      headers = new Headers(this.headers || headers)
     }
 
     if (
       body !== undefined &&
       body !== null &&
-      !["GET", "HEAD"].includes(method)
+      !['GET', 'HEAD'].includes(method)
     ) {
-      const contentType = headers.get("content-type") || "";
+      const contentType = headers.get('content-type') || ''
 
       if (
         (!contentType &&
           body &&
-          Object.prototype.toString.call(body) === "[object Object]") ||
-        contentType.startsWith("application/json")
+          Object.prototype.toString.call(body) === '[object Object]') ||
+        contentType.startsWith('application/json')
       ) {
-        if (!headers.has("content-type")) {
-          headers.set("content-type", "application/json");
+        if (!headers.has('content-type')) {
+          headers.set('content-type', 'application/json')
         }
 
-        body = JSON.stringify(body);
+        body = JSON.stringify(body)
       } else if (
-        contentType.startsWith("multipart/form-data") &&
+        contentType.startsWith('multipart/form-data') &&
         body &&
         !(body instanceof FormData)
       ) {
-        body = createFormData(body as FormBody);
+        body = createFormData(body as FormBody)
       } else if (
-        contentType.startsWith("application/x-www-form-urlencoded") &&
+        contentType.startsWith('application/x-www-form-urlencoded') &&
         body &&
         !(body instanceof URLSearchParams)
       ) {
-        body = createURLSearchParams(body as Query);
+        body = createURLSearchParams(body as Query)
       }
     }
 
@@ -224,46 +224,46 @@ class Teleman {
       options: {
         method,
         headers,
-        body: body as ReqBody,
+        body: body as ReqBody
       },
 
-      ...rest,
-    };
+      ...rest
+    }
 
     return <Promise<T>>compose(use)(ctx, () =>
-      fetch(ctx.url.href, ctx.options).then((response) => {
-        ctx.response = response;
-        let body: Promise<unknown> = Promise.resolve(response);
+      fetch(ctx.url.href, ctx.options).then(response => {
+        ctx.response = response
+        let body: Promise<unknown> = Promise.resolve(response)
 
-        if (!["HEAD", "head"].includes(ctx.options.method)) {
-          const responseType = response.headers.get("content-type");
+        if (!['HEAD', 'head'].includes(ctx.options.method)) {
+          const responseType = response.headers.get('content-type')
 
           if (responseType) {
-            if (responseType.startsWith("application/json")) {
-              body = response.json();
-            } else if (responseType.startsWith("text/")) {
-              body = response.text();
+            if (responseType.startsWith('application/json')) {
+              body = response.json()
+            } else if (responseType.startsWith('text/')) {
+              body = response.text()
             }
           }
         }
 
         if (response.ok) {
-          return body;
+          return body
         } else {
-          return body.then((e) => {
-            throw e;
-          });
+          return body.then(e => {
+            throw e
+          })
         }
       })
-    );
+    )
   }
 
   get<T>(path: string, query?: Query, options?: ReqOptions) {
     return this.fetch<T>(path, {
       ...options,
-      method: "GET",
-      query,
-    });
+      method: 'GET',
+      query
+    })
   }
 
   post<T>(
@@ -273,9 +273,9 @@ class Teleman {
   ) {
     return this.fetch<T>(path, {
       ...options,
-      method: "POST",
-      body,
-    });
+      method: 'POST',
+      body
+    })
   }
 
   put<T>(
@@ -285,9 +285,9 @@ class Teleman {
   ) {
     return this.fetch<T>(path, {
       ...options,
-      method: "PUT",
-      body,
-    });
+      method: 'PUT',
+      body
+    })
   }
 
   patch<T>(
@@ -297,36 +297,36 @@ class Teleman {
   ) {
     return this.fetch<T>(path, {
       ...options,
-      method: "PATCH",
-      body,
-    });
+      method: 'PATCH',
+      body
+    })
   }
 
   delete<T>(path: string, query?: Query, options?: ReqOptions) {
     return this.fetch<T>(path, {
       ...options,
-      method: "DELETE",
-      query,
-    });
+      method: 'DELETE',
+      query
+    })
   }
 
   head<T>(path: string, query?: Query, options?: ReqOptions) {
     return this.fetch<T>(path, {
       ...options,
-      method: "HEAD",
-      query,
-    });
+      method: 'HEAD',
+      query
+    })
   }
 
   purge<T>(path: string, query?: Query, options?: ReqOptions) {
     return this.fetch<T>(path, {
       ...options,
-      method: "PURGE",
-      query,
-    });
+      method: 'PURGE',
+      query
+    })
   }
 }
 
-export default Teleman;
-export { Teleman };
-export const teleman = new Teleman();
+export default Teleman
+export { Teleman }
+export const teleman = new Teleman()
